@@ -10,9 +10,9 @@ ng-polymer-elements overcomes this by applying directived to Polymer web compone
 
 For example, the following code binds the scope's "myText" property to Polymer's paper-input "inputValue" property using the ng-model attribute, very similarly to how it looks for a basic text input:
 
-````
+```html
 <paper-input ng-model="myText"></paper-input>
-````
+```
 
 ## Installation and Bootstrapping
 
@@ -22,17 +22,17 @@ Add the script `ng-polymer-elements.js` or `ng-polymer-elements.min.js` to your 
 
 **Important** : ng-polymer-elements requires that the Polymer platform be loaded and ready before running AngularJS bootstrapping. If you are using autmatic bootstrapping (ng-app="myModule" in your HTML) then ng-polymer-elements will handle this for you, but if you use manual bootstrapping you need to make sure it happens after the 'polymer-ready' event has been fired **and** wrap the target DOM element:
 
-````
+```javascript
 window.addEventListener('polymer-ready', function() {
     angular.bootstrap(wrap(document), ['myModule']);
 });
-````
+```
 
 Add the ng-polymer-elements module to your application dependencies:
 
-````
+```javascript
 angular.module('myModule', ['ng-polymer-elements']);
-````
+```
 
 ## Available Component Support
 
@@ -51,19 +51,22 @@ The following components support two-way binding of primitive values using ng-mo
 
 For [core-list](http://www.polymer-project.org/docs/elements/core-elements.html#core-list) ng-model is used to bind the list data, and ng-tap is used to bind the tap event, and exposes the event as "$event".
 
-````
+```html
 <core-list ng-model="arrayData" ng-tap="onTap($event)">
     <template>
         <div>{{text}}</div>
     </template>
 </core-list>
+```
 
+```javascript
 $scope.arrayData = [{text: 'one'}, {text: 'two'}, {text: 'three'}];
 
 $scope.onTap = function(event) {
     var tappedItem = event.details.data;
 };
-````
+```
+
 See  /example/index.html for coverage of most supported components.
 
 ## Supporting Additional Components
@@ -72,7 +75,7 @@ You can easily add mapping for additional components, or change the provided map
 
 In the following example we add support for my-component, with binding of the value in the "ng-model" attribute to my-component's "itemValue", and the event in the "ng-click" attribute to my-component's "item-clicked" event:
 
-````
+```javascript
 window.NG_POLYMER_ELEMENTS_EXTENDED_MAPPINGS = {
     myComponent: {
         ngModel: {
@@ -83,10 +86,10 @@ window.NG_POLYMER_ELEMENTS_EXTENDED_MAPPINGS = {
         }
     }
 };
-````
+```
 
 The above definition will allow us to write the following:
 
-````
+```html
 <my-component ng-model="someValue" ng-click="doSomething($event)"></my-component>
-````
+```
