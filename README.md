@@ -1,5 +1,5 @@
 # ng-polymer-elements
-===
+
 ## Introduction
 
 Web components make is possible to write encapsulated pieces of view and logic independently from any framework. The Polymer project contains a platform for pollyfilling and writing web components, and two sets of web components: core elements and paper elements.
