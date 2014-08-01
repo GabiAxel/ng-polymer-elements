@@ -11,6 +11,9 @@
     var inputMappings = {
         ngModel: {
             primitive: 'inputValue'
+        },
+        ngDisabled: {
+        	primitive: 'disabled'
         }
     };
     
@@ -23,7 +26,10 @@
     var checkMappings = {
     	ngModel: {
     		primitive: 'checked'
-    	}
+    	},
+        ngDisabled: {
+        	primitive: 'disabled'
+        }
     };
     
     var openableMappings = {
@@ -45,7 +51,10 @@
         paperSlider: {
         	ngModel: {
         		primitive: 'value'
-        	}
+        	},
+            ngDisabled: {
+            	primitive: 'disabled'
+            }
         },
         coreList: {
             ngModel: {
