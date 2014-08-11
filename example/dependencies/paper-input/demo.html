@@ -2,7 +2,7 @@
 <html>
 <head>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
   <title>paper-input</title>
 
@@ -28,14 +28,18 @@
   </style>
 
 </head>
-<body unresolved touch-action="auto">
+<body unresolved>
   <section>
 
     <paper-input label="Type something..."></paper-input>
 
     <br>
 
-    <paper-input label="Type only numbers..." validate="^[0-9]*$" error="Input is not a number!"></paper-input>
+    <paper-input label="Type only numbers..." type="number" error="Input is not a number!"></paper-input>
+
+    <br>
+
+    <paper-input label="Type something..." required error="This input requires a value!"></paper-input>
 
     <br>
 
@@ -47,7 +51,7 @@
 
     <br>
 
-    <paper-input floatingLabel label="Type only numbers... (floating)" validate="^[0-9]*$" error="Input is not a number!"></paper-input>
+    <paper-input floatingLabel label="Type only numbers... (floating)" type="number" error="Input is not a number!"></paper-input>
 
     <br>
 

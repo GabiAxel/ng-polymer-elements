@@ -60,7 +60,7 @@ To change the bar color for unchecked state:
 
 <link rel="import" href="../paper-radio-button/paper-radio-button.html">
 
-<polymer-element name="paper-toggle-button" attributes="checked" touch-action="pan-y" role="button" aria-pressed="false" tabindex="0">
+<polymer-element name="paper-toggle-button" attributes="checked" role="button" aria-pressed="false" tabindex="0">
 <template>
 
   <link rel="stylesheet" href="paper-toggle-button.css">
@@ -70,7 +70,7 @@ To change the bar color for unchecked state:
     <div id="toggleBar" checked?="{{checked}}"></div>
   
     <paper-radio-button id="toggleRadio" toggles checked="{{checked}}"
-        on-trackstart="{{trackStart}}" on-track="{{track}}" on-trackend="{{trackEnd}}"></paper-radio-button>
+        on-trackstart="{{trackStart}}" on-trackx="{{trackx}}" on-trackend="{{trackEnd}}"></paper-radio-button>
     
   </div>
 
@@ -99,7 +99,7 @@ To change the bar color for unchecked state:
       e.preventTap();
     },
 
-    track: function(e) {
+    trackx: function(e) {
       this._x = Math.min(this._w, 
           Math.max(0, this.checked ? this._w + e.dx : e.dx));
       this.$.toggleRadio.classList.add('dragging');

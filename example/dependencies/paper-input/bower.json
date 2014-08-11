@@ -2,7 +2,8 @@
   "name": "paper-input",
   "private": true,
   "dependencies": {
-    "polymer": "Polymer/polymer#>=0.3.0 <1.0.0",
-    "core-input": "Polymer/core-input#>=0.3.0 <1.0.0"
+    "polymer": "Polymer/polymer#master",
+    "core-input": "Polymer/core-input#master",
+    "core-style": "Polymer/core-style#master"
   }
 }

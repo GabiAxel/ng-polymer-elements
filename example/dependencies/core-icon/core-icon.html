@@ -46,7 +46,7 @@ See [core-icons](http://www.polymer-project.org/components/core-icons/demo.html)
 
 <link rel="stylesheet" href="core-icon.css" shim-shadowdom>
 
-<polymer-element name="core-icon" attributes="src icon">
+<polymer-element name="core-icon" attributes="src icon alt">
 <script>
 (function() {
   
@@ -76,8 +76,21 @@ See [core-icons](http://www.polymer-project.org/components/core-icons/demo.html)
      */
     icon: '',
 
+    /**
+     * Alternative text content for accessibility support.
+     * If alt is present and not empty, it will set the element's role to img and add an aria-label whose content matches alt.
+     * If alt is present and is an empty string, '', it will hide the element from the accessibility layer
+     * If alt is not present, it will set the element's role to img and the element will fallback to using the icon attribute for its aria-label.
+     * 
+     * @attribute alt
+     * @type string
+     * @default ''
+     */
+    alt: null,
+
     observe: {
-      'icon': 'updateIcon'
+      'icon': 'updateIcon',
+      'alt': 'updateAlt'
     },
 
     defaultIconset: 'icons',
@@ -86,7 +99,16 @@ See [core-icons](http://www.polymer-project.org/components/core-icons/demo.html)
       if (!meta) {
         meta = document.createElement('core-iconset');
       }
-      this.updateIcon();
+
+      // Allow user-provided `aria-label` in preference to any other text alternative.
+      if (this.hasAttribute('aria-label')) {
+        // Set `role` if it has not been overridden.
+        if (!this.hasAttribute('role')) {
+          this.setAttribute('role', 'img');
+        }
+        return;
+      }
+      this.updateAlt();
     },
 
     srcChanged: function() {
@@ -106,8 +128,9 @@ See [core-icons](http://www.polymer-project.org/components/core-icons/demo.html)
       return meta.byId(name || this.defaultIconset);
     },
 
-    updateIcon: function() {
+    updateIcon: function(oldVal, newVal) {
       if (!this.icon) {
+        this.updateAlt();
         return;
       }
       var parts = String(this.icon).split(':');
@@ -119,6 +142,41 @@ See [core-icons](http://www.polymer-project.org/components/core-icons/demo.html)
           if (this._icon) {
             this._icon.setAttribute('fit', '');
           }
+        }
+      }
+      // Check to see if we're using the old icon's name for our a11y fallback
+      if (oldVal) {
+        if (oldVal.split(':').pop() == this.getAttribute('aria-label')) {
+          this.updateAlt();
+        }
+      }
+    },
+
+    updateAlt: function() {
+      // Respect the user's decision to remove this element from
+      // the a11y tree
+      if (this.getAttribute('aria-hidden')) {
+        return;
+      }
+
+      // Remove element from a11y tree if `alt` is empty, otherwise
+      // use `alt` as `aria-label`.
+      if (this.alt === '') {
+        this.setAttribute('aria-hidden', 'true');
+        if (this.hasAttribute('role')) {
+          this.removeAttribute('role');
+        }
+        if (this.hasAttribute('aria-label')) {
+          this.removeAttribute('aria-label');
+        }
+      } else {
+        this.setAttribute('aria-label', this.alt ||
+                                        this.icon.split(':').pop());
+        if (!this.hasAttribute('role')) {
+          this.setAttribute('role', 'img');
+        }
+        if (this.hasAttribute('aria-hidden')) {
+          this.removeAttribute('aria-hidden');
         }
       }
     }

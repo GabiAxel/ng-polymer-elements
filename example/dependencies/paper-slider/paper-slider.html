@@ -69,11 +69,11 @@ To change the slider secondary progress bar color:
 
   <link rel="stylesheet" href="paper-slider.css">
 
-  <div id="sliderContainer" touch-action="pan-y" on-keydown="{{keydown}}">
+  <div id="sliderContainer" on-keydown="{{keydown}}">
   
     <paper-progress id="sliderBar" aria-hidden="true" min="{{min}}" max="{{max}}" value="{{immediateValue}}" secondaryProgress="{{secondaryProgress}}"
         on-down="{{bardown}}" on-up="{{resetKnob}}" 
-        on-trackstart="{{trackStart}}" on-track="{{track}}" on-trackend="{{trackEnd}}"></paper-progress>
+        on-trackstart="{{trackStart}}" on-trackx="{{trackx}}" on-trackend="{{trackEnd}}"></paper-progress>
     
     <template if="{{snaps && !disabled}}">
       <div class="slider-markers" horizontal layout>
@@ -84,8 +84,8 @@ To change the slider secondary progress bar color:
     </template>
     
     <div id="sliderKnob" class="{{ {pin : pin, snaps : snaps} | tokenList }}"
-        touch-action="none" on-down="{{expandKnob}}" on-up="{{resetKnob}}" 
-        on-trackstart="{{trackStart}}" on-track="{{track}}" on-trackend="{{trackEnd}}"
+        on-down="{{expandKnob}}" on-up="{{resetKnob}}" 
+        on-trackstart="{{trackStart}}" on-trackx="{{trackx}}" on-trackend="{{trackEnd}}"
         on-transitionend="{{knobTransitionEnd}}"
         role="slider" aria-valuenow="{{value}}" aria-valuemin="{{min}}" aria-valuemax="{{max}}"
         aria-valuetext="{{value}}" tabindex="0"
@@ -242,7 +242,7 @@ To change the slider secondary progress bar color:
       e.preventTap();
     },
 
-    track: function(e) {
+    trackx: function(e) {
       var x = Math.min(this._maxx, Math.max(this._minx, e.dx));
       this._x = this._startx + x;
       this._ratio = this._x / this._w;

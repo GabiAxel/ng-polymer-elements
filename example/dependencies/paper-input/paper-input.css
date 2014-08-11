@@ -36,23 +36,13 @@
   width: 100%;
 }
 
+:host /deep/ input:invalid,
+:host /deep/ textarea:invalid {
+  box-shadow: none;
+}
+
 .host /deep/ textarea {
   resize: none;
-}
-
-.focusedColor {
-  color: #4059a9;
-  background: #4059a9;
-}
-
-:host(.invalid) #underline,
-:host(.invalid) #underlineHighlight,
-:host(.invalid) .focusedColor {
-  color: #d34336;
-  background: #d34336;
-}
-:host(.invalid) #floatedLabel {
-  color: #d34336;
 }
 
 #floatedLabel {
@@ -76,8 +66,10 @@
   width: 100%;
   padding: 0.5em 0;
   background: transparent;
+  -moz-transform-origin: 0% 0%;
   -webkit-transform-origin: 0% 0%;
   transform-origin: 0% 0%;
+  pointer-events: none;
 }
 #label.hidden {
   display: none;
@@ -111,7 +103,6 @@
 #error {
   -webkit-flex: 1;
   flex: 1;
-  color: #d34336;
   font-size: 0.75em;
   padding: 0.5em 0;
 }
@@ -135,7 +126,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -1;
+  bottom: -1px;
 }
 
 :host([multiline]) #underlineContainer {
@@ -193,6 +184,7 @@
   right: 0;
   bottom: 0;
   opacity: 0;
+  -moz-transform-origin: 0%;
   -webkit-transform-origin-x: 0%;
   transform-origin-x: 0%;
   -webkit-transform: scaleX(1) translateX(10%);

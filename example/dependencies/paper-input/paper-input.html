@@ -16,6 +16,12 @@ Example:
     <paper-input label="Your Name"></paper-input>
     <paper-input multiline label="Enter multiple lines here"></paper-input>
 
+Theming
+--------
+
+Set `CoreStyle.g.paperInput.focusedColor` and `CoreStyle.g.paperInput.invalidColor` to theme
+the focused and invalid states.
+
 @group Paper Elements
 @element paper-input
 @extends core-input
@@ -23,12 +29,39 @@ Example:
 -->
 <link href="../polymer/polymer.html" rel="import">
 <link href="../core-input/core-input.html" rel="import">
+<link href="../core-style/core-style.html" rel="import">
+
+<core-style id="paper-input">
+
+#label.focused,
+#floatedLabel.focused {
+  color: {{g.paperInput.focusedColor}};
+}
+
+#underlineHighlight.focused,
+#caretInner {
+  background-color: {{g.paperInput.focusedColor}};
+}
+
+#error,
+:host(.invalid) #label.focused,
+:host(.invalid) #floatedLabel.focused {
+  color: {{g.paperInput.invalidColor}};
+}
+:host(.invalid) #underlineHighlight.focused,
+:host(.invalid) #caretInner {
+  background-color: {{g.paperInput.invalidColor}};
+}
+
+</core-style>
 
 <polymer-element name="paper-input" extends="core-input" attributes="label floatingLabel maxRows error" on-down="{{downAction}}" on-up="{{upAction}}">
 
   <template>
 
     <link href="paper-input.css" rel="stylesheet">
+
+    <core-style ref="paper-input"></core-style>
 
     <div id="floatedLabel" class="hidden" hidden?="{{!floatingLabel}}"><span id="floatedLabelSpan">{{label}}</span></div>
 
@@ -63,13 +96,19 @@ Example:
     </div>
 
     <div id="errorContainer">
-      <div id="error" role="alert" aria-hidden="{{!invalid}}">{{error}}</div>
+      <div id="error" role="alert" aria-hidden="{{!invalid}}">{{error || validationMessage}}</div>
       <div id="errorIcon"></div>
     </div>
 
   </template>
 
   <script>
+
+  (function() {
+
+    var paperInput = CoreStyle.g.paperInput = CoreStyle.g.paperInput || {};
+    paperInput.focusedColor = '#4059a9';
+    paperInput.invalidColor = '#d34336';
 
     Polymer('paper-input', {
 
@@ -105,6 +144,16 @@ Example:
        */
       maxRows: 0,
 
+      /**
+       * The message to display if the input value fails validation. If this
+       * is unset or the empty string, a default message is displayed depending
+       * on the type of validation error.
+       *
+       * @attribute error
+       * @type string
+       */
+      error: '',
+
       focused: false,
       pressed: false,
 
@@ -127,6 +176,28 @@ Example:
         }
         this.$.inputContainer.style.height = height + 'px';
         this.$.underlineContainer.style.top = height + 'px';
+      },
+
+      prepareLabelTransform: function() {
+        var toRect = this.$.floatedLabelSpan.getBoundingClientRect();
+        var fromRect = this.$.labelSpan.getBoundingClientRect();
+        if (toRect.width !== 0) {
+          this.$.label.cachedTransform = 'scale(' + (toRect.width / fromRect.width) + ') ' +
+            'translateY(' + (toRect.bottom - fromRect.bottom) + 'px)';
+        }
+      },
+
+      toggleLabel: function(force) {
+        var v = force !== undefined ? force : this.inputValue;
+
+        if (!this.floatingLabel) {
+          this.$.label.classList.toggle('hidden', v);
+        }
+
+        if (this.floatingLabel && !this.focused) {
+          this.$.label.classList.toggle('hidden', v);
+          this.$.floatedLabel.classList.toggle('hidden', !v);
+        }
       },
 
       rowsChanged: function() {
@@ -161,22 +232,16 @@ Example:
           this.resizeInput();
         }
 
-        if (!this.floatingLabel) {
-          this.$.label.classList.toggle('hidden', this.inputValue);
-        }
-
-        if (this.floatingLabel && !this.focused) {
-          this.$.label.classList.toggle('hidden', this.inputValue);
-          this.$.floatedLabel.classList.toggle('hidden', !this.inputValue);
-        }
+        this.toggleLabel();
       },
 
       labelChanged: function() {
         if (this.floatingLabel && this.$.floatedLabel && this.$.label) {
-          var toRect = this.$.floatedLabelSpan.getBoundingClientRect();
-          var fromRect = this.$.labelSpan.getBoundingClientRect();
-          this.$.label.cachedTransform = 'scale(' + (toRect.width / fromRect.width) + ') ' +
-            'translateY(' + (toRect.bottom - fromRect.bottom) + 'px)'
+          // If the element is created programmatically, labelChanged is called before
+          // binding. Run the measuring code in async so the DOM is ready.
+          this.async(function() {
+            this.prepareLabelTransform();
+          });
         }
       },
 
@@ -184,7 +249,7 @@ Example:
         this.label = this.placeholder;
       },
 
-      focusAction: function(e) {
+      inputFocusAction: function() {
         if (!this.pressed) {
           if (this.floatingLabel) {
             this.$.floatedLabel.classList.remove('hidden');
@@ -194,22 +259,34 @@ Example:
           this.$.label.classList.add('hidden');
           this.$.underlineHighlight.classList.add('focused');
           this.$.caret.classList.add('focused');
-          this.$.input.focus();
+
+          this.super(arguments);
         }
         this.focused = true;
       },
 
-      blurAction: function() {
+      shouldFloatLabel: function() {
+        // if type = number, the input value is the empty string until a valid number
+        // is entered so we must do some hacks here
+        return this.inputValue || (this.type === 'number' && !this.validity.valid);
+      },
+
+      inputBlurAction: function() {
+        this.super(arguments);
+
         this.$.underlineHighlight.classList.remove('focused');
         this.$.caret.classList.remove('focused');
+
         if (this.floatingLabel) {
           this.$.floatedLabel.classList.remove('focused');
           this.$.floatedLabel.classList.remove('focusedColor');
-          if (!this.inputValue) {
+          if (!this.shouldFloatLabel()) {
             this.$.floatedLabel.classList.add('hidden');
           }
         }
-        if (!this.inputValue) {
+
+        // type = number hack. see core-input for more info
+        if (!this.shouldFloatLabel()) {
           this.$.label.classList.remove('hidden');
           this.$.label.classList.add('animating');
           this.async(function() {
@@ -217,6 +294,7 @@ Example:
             this.$.label.style.transform = 'none';
           });
         }
+
         this.focused = false;
       },
 
@@ -241,11 +319,7 @@ Example:
 
         // No caret animation if there is text in the input.
         if (!this.inputValue) {
-          var width = this.$.inputCloneSpan.getBoundingClientRect().width;
-          if (width < right) {
-            this.$.caret.style.left = width + 'px';
-            this.$.caret.classList.remove('focused');
-          }
+          this.$.caret.classList.remove('focused');
         }
       },
 
@@ -291,8 +365,24 @@ Example:
         if (this.floatingLabel) {
           this.$.label.classList.add('focusedColor');
           this.$.label.classList.add('animating');
+          if (!this.$.label.cachedTransform) {
+            this.prepareLabelTransform();
+          }
           this.$.label.style.webkitTransform = this.$.label.cachedTransform;
           this.$.label.style.transform = this.$.label.cachedTransform;
+        }
+      },
+
+      keydownAction: function() {
+        this.super();
+
+        // more type = number hacks. see core-input for more info
+        if (this.type === 'number') {
+          this.async(function() {
+            if (!this.inputValue) {
+              this.toggleLabel(!this.validity.valid);
+            }
+          });
         }
       },
 
@@ -335,6 +425,8 @@ Example:
       }
 
     });
+
+  }());
 
   </script>
 
