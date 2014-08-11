@@ -43,6 +43,7 @@
         paperInput: inputMappings,
         paperRadioGroup: selectorMappings,
         paperTabs: selectorMappings,
+        coreDropdown: selectorMappings,
         paperCheckbox: checkMappings,
         paperToggleButton: checkMappings,
         coreOverlay: openableMappings,
@@ -203,5 +204,5 @@
     	}
     	
     });
-    
+        
 })(angular);
