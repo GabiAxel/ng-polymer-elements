@@ -5,7 +5,11 @@
 	"devDependencies": {
 		"grunt": "~0.4.1",
 		"grunt-contrib-uglify": "~0.2.5",
-		"grunt-contrib-jshint": "~0.7.0"
+		"grunt-contrib-jshint": "~0.7.0",
+        "grunt-contrib-clean": "~0.5.0",
+        "grunt-contrib-copy": "~0.5.0",
+        "grunt-gh-pages": "^0.9.1",
+        "grunt-text-replace": "^0.3.12"
 	},
 	"engines":{
 		"node":"0.10.10"
