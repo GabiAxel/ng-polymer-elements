@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html ng-app="ng-polymer-elements-example">
+<head>
+<meta itemprop="name" content="ng-polymer-elements">
+<meta itemprop="description" content="AngularJS two-way binding for Web Components">
+<meta name="description" content="AngularJS two-way binding for Web Components">
+<meta name="keywords" content="polymer,angular,angularjs,web components,core elements, paper elements">
+<title>ng-polymer-elements</title>
+<script src="bower_components/platform/platform.js"></script>
+<link rel="import" href="bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/core-input/core-input.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
+<link rel="import" href="bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="bower_components/core-list/core-list.html">
+<link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+<link rel="stylesheet" type="text/css" href="bower_components/fontawesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="bower_components/google-code-prettify/bin/prettify.min.css">
+<style shim-shadowdom>
+	body {
+		margin: 20px 0;
+	}
+	#counters {
+		margin-top: 20px;
+	}
+	paper-checkbox {
+		margin-right: 100px;
+	}
+	#openable-example paper-button {
+		margin-right: 20px;
+    	width: 130px;
+	}
+	#openable-example > div {
+		margin-bottom: 20px;
+	}
+</style>
+</head>
+<body unresolved>
+	<a href="https://github.com/GabiAxel/ng-polymer-elements"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+	<div class="container">
+		<div class="jumbotron text-center">
+			<h1>ng-polymer-elements</h1>
+			<p>AngularJS two-way binding for Web Components</p>
+			<p>Out of the box support for Polymer Core and Paper elements</p>
+			<div>
+				<a href="https://github.com/GabiAxel/ng-polymer-elements" class="btn btn-default">
+					<i class="fa fa-github"></i> View on GitHub
+				</a>
+				<a href="https://github.com/GabiAxel/ng-polymer-elements/archive/0.1.0.zip" class="btn btn-primary">
+					<i class="fa fa-download"></i> Download <small>(0.1.0)</small>
+				</a>
+			</div>
+			<div id="counters">
+				<iframe src="http://ghbtns.com/github-btn.html?user=gabiaxel&repo=ng-polymer-elements&type=watch&count=true"
+  					allowtransparency="true" frameborder="0" scrolling="0" width="95" height="20"></iframe>
+  				<iframe src="http://ghbtns.com/github-btn.html?user=gabiaxel&repo=ng-polymer-elements&type=fork&count=true"
+  					allowtransparency="true" frameborder="0" scrolling="0" width="95" height="20"></iframe>
+				<div class="g-plusone" data-size="medium"></div>
+				<a href="https://twitter.com/share" class="twitter-share-button" data-url="https://gabiaxel.github.io/ng-polymer-elements" data-lang="en">Tweet</a>
+			</div>
+		</div>
+		<h3>Why do I need it?</h3>
+		<p>
+			AngularJS and Web Components both provide binding mechanisms, and for some cases you can bind the 
+			scope properties to Web Components attributes. For example, the following code works fine:
+		</p>
+		<div horizontal layout>
+			<div class="col-sm-6">
+				<pre class="prettyprint">$scope.buttonLabel = 'Click me';
+
+$scope.buttonAction = function() {
+   alert('Button clicked');
+};</pre><pre class="prettyprint" ng-non-bindable>&lt;paper-button label="{{buttonLabel}}" on-click="buttonAction()"&gt;
+&lt;/paper-button&gt;</pre>
+			</div>
+			<div class="col-sm-6" ng-controller="PlainExampleCtrl as ctrl">
+				<paper-button label="{{ctrl.buttonLabel}}" ng-click="ctrl.buttonAction()" raisedButton></paper-button>
+			</div>
+		</div>
+		<p>
+			There are two cases where you can't get Web Components to work with your AngularJS models:
+			<ul>
+				<li>Having Web Components update your model, for example <code ng-non-bindable>&lt;core-input value="{{myModel}}"&gt;&lt;/core-input&gt; </code>will not change <code>myModel</code> when the user changes the input text.
+				</li>
+				<li>Binding anything other than a string, for example <code ng-non-bindable>&lt;core-list data="{{myList}}"&gt;&lt;core-list&gt;</code> will not work because the expression <code ng-non-bindable>{{myList}}</code> will be treated as a string.</li>
+			</ul>
+			Enters ng-polymer-elements.
+		</p>
+		<hr/>
+		<h3>What does it do?</h3>
+		<p>
+			ng-polymer-elements creates directives for existing custom elements, allowing you to use them as you would any directive.
+			The following example shows how you can use core-input and paper-input with a model as if they were "plain" input:
+		</p>
+		<div class="row">
+			<div class="col-sm-6">
+				<pre class="prettyprint">&lt;input type="text" ng-model="text"/&gt;
+&lt;core-input ng-model="text"&gt;&lt;/core-input&gt;
+&lt;paper-input ng-model="text""&gt;&lt;/paper-input&gt;</pre>
+			</div>
+			<div class="col-sm-6">
+				<div vertical layout>
+					<input type="text" ng-model="text" class="corm-control" placeholder="input"/>
+					<core-input ng-model="text" placeholder="core-input"></core-input>
+					<paper-input ng-model="text" label="paper-input"></paper-input>
+				</div>
+			</div>
+		</div>
+		<hr/>
+		<h3>How do I install it?</h3>
+		<p>
+			Either install it with bower using <code>bower install ng-polymer-elements</code> or <a href="https://github.com/GabiAxel/ng-polymer-elements/archive/0.1.0.zip">download the release</a>.<br/><br/>
+			Add <code>ng-polymer-elements</code> to your module's dependencies.<br/><br/>
+			AngularJS should be bootstrapped only after the custom elements have been registered. If you use automatic bootstrap 
+			(ie. <code>&lt;html ng-app="myModule"&gt;</code></code>), ng-polymer-elements takes care of this, but if you use manual bootstrap, you need to call <code>angular.bootstrap()</code> only after Polymer has been loaded, and with a wrapped DOM element:
+		</p>
+			<pre class="prettyprint">window.addEventListener('polymer-ready', function() {
+   angular.bootstrap(wrap(document), ['myModule']);
+});</pre>
+		<p>
+			Also remember to include the Polymer platform script and any imports you use in your HTML head, and to add the <code>unresolved</code> attribute to your HTML body.
+			The general structure of your HTML should be like so:
+		</p>
+		<pre class="prettyprint">&lt;!DOCTYPE html&gt;
+&lt;html ng-app="myModule"&gt;
+   &lt;head&gt;
+      &lt;script src="platform.js"&gt;&lt;/script&gt;
+      &lt;!-- your imports here --&gt;
+   &lt;/head&gt;
+   &lt;body unresolved&gt;
+      &lt;!-- your view here --&gt;
+      &lt;script src="angular.js"&gt;&lt;/script&gt;
+      &lt;script src="ng-polymer-elements.js"&gt;&lt;/script&gt;
+      &lt;!-- your scripts here --&gt;
+   &lt;/body&gt;
+&lt;/html&gt;</pre>
+		<hr/>
+		<h3>Show me the magic!</h3>
+		<p>ng-polymer-elements comes with support for the following Polymer elements:</p>
+		<dl class="dl-horizontal">
+			<dt>String</dt>
+			<dd>
+				<ul class="list-unstyled">
+					<li><a href="http://www.polymer-project.org/docs/elements/core-elements.html#core-input">core-input</a></li>
+					<li><a href="http://www.polymer-project.org/docs/elements/paper-elements.html#paper-input">paper-input</a></li>
+					<li><a href="http://www.polymer-project.org/docs/elements/paper-elements.html#paper-radio-group">paper-radio-group</a></li>
+				</ul>
+			</dd>
+			<dt>Number</dt>
+			<dd>
+				<ul class="list-unstyled">
+					<li><a href="http://www.polymer-project.org/docs/elements/paper-elements.html#paper-tabs">paper-tabs</a></li>
+					<li><a href="http://www.polymer-project.org/docs/elements/paper-elements.html#paper-slider">paper-slider</a></li>
+				</ul>
+			</dd>
+			<dt>Boolean</dt>
+			<dd>
+				<ul class="list-unstyled">
+					<li><a href="http://www.polymer-project.org/docs/elements/paper-elements.html#paper-checkbox">paper-checkbox</a></li>
+					<li><a href="http://www.polymer-project.org/docs/elements/paper-elements.html#paper-toggle-button">paper-toggle-button</a></li>
+					<li><a href="http://www.polymer-project.org/docs/elements/core-elements.html#core-overlay">core-overlay</a></li>
+					<li><a href="http://www.polymer-project.org/docs/elements/paper-elements.html#paper-dialog">paper-dialog</a></li>
+					<li><a href="http://www.polymer-project.org/docs/elements/paper-elements.html#paper-toast">paper-toast</a></li>
+				</ul>
+			</dd>
+			<dt>Array</dt>
+			<dd>
+				<ul class="list-unstyled">
+					<li><a href="http://www.polymer-project.org/docs/elements/core-elements.html#core-list">core-list</a></li>
+				</ul>
+			</dd>
+		</dl>
+		<hr/>
+		<p>We saw above how to bind the value of core-input and paper-input. Here is a similar example, this time with multiline:</p>
+		<div class="row">
+			<div class="col-sm-6">
+				<pre class="prettyprint">&lt;textarea ng-model="multilineText"&gt;&lt;/textarea&gt;
+&lt;core-input ng-model="multilineText" multiline&gt;&lt;/core-input&gt;
+&lt;paper-input ng-model="multilineText" multiline&gt;&lt;/paper-input&gt;</pre>
+			</div>
+			<div class="col-sm-6">
+				<div vertical layout>
+					<textarea ng-model="multilineText" class="corm-control" placeholder="textarea"></textarea>
+					<core-input ng-model="multilineText" multiline rows="3" placeholder="core-input"></core-input>
+					<paper-input ng-model="multilineText" multiline rows="3" label="paper-input"></paper-input>
+				</div>
+			</div>
+		</div>
+		<hr/>
+		<p>The following example shows the binding of a paper-radio-group selected value:</p>
+		<div class="row">
+			<div class="col-sm-6">
+				<pre ng-non-bindable class="prettyprint">&lt;paper-radio-group ng-model="radio"&gt;
+   &lt;paper-radio-button name="one" label="One"&gt;&lt;/paper-radio-button&gt;
+   &lt;paper-radio-button name="two" label="Two"&gt;&lt;/paper-radio-button&gt;
+   &lt;paper-radio-button name="three" label="Three"&gt;&lt;/paper-radio-button&gt;
+&lt;/paper-radio-group&gt;
+&lt;span&gt;Selected: {{radio}}&lt;/span&gt;</pre>
+			</div>
+			<div class="col-sm-6" vertical layout>
+				<paper-radio-group ng-model="radio">
+					<paper-radio-button name="one" label="One"></paper-radio-button>
+					<paper-radio-button name="two" label="Two"></paper-radio-button>
+					<paper-radio-button name="three" label="Three"></paper-radio-button>
+				</paper-radio-group>
+				<span>Selected: {{radio}}</span>
+			</div>
+		</div>
+		<hr/>
+		<p>The following example shows the binding of paper-tabs and paper-slider to a numeric value:</p>
+		<div class="row">
+			<div class="col-sm-6">
+				<pre class="prettyprint">&lt;paper-slider ng-model="number" max="5"&gt;&lt;/paper-slider&gt;
+
+&lt;paper-tabs ng-model="number"&gt;
+   &lt;paper-tab&gt;0&lt;/paper-tab&gt;
+   &lt;paper-tab&gt;1&lt;/paper-tab&gt;
+   &lt;paper-tab&gt;2&lt;/paper-tab&gt;
+   &lt;paper-tab&gt;3&lt;/paper-tab&gt;
+   &lt;paper-tab&gt;4&lt;/paper-tab&gt;
+   &lt;paper-tab&gt;5&lt;/paper-tab&gt;
+&lt;/paper-tabs&gt;</pre>
+			</div>
+			<div class="col-sm-6" vertical layout>
+				<paper-slider ng-model="number" max="5" snaps pin></paper-slider>
+				<core-toolbar>
+					<paper-tabs ng-model="number" flex>
+						<paper-tab>0</paper-tab>
+						<paper-tab>1</paper-tab>
+						<paper-tab>2</paper-tab>
+						<paper-tab>3</paper-tab>
+						<paper-tab>4</paper-tab>
+						<paper-tab>5</paper-tab>
+					</paper-tabs>
+				</core-toolbar>
+			</div>
+		</div>
+		<hr/>
+		<p>The following example shows the binding of paper-checkbox and paper-toggle-button to a boolean value:</p>
+		<div class="row">
+			<div class="col-sm-6">
+				<pre class="prettyprint">&lt;paper-checkbox ng-model="boolean"&gt;&lt;/paper-checkbox&gt;
+&lt;paper-toggle-button ng-model="boolean"&gt;&lt;/paper-toggle-button&gt;</pre>
+			</div>
+			<div class="col-sm-6" horizontal layout>
+				<paper-checkbox ng-model="boolean"></paper-checkbox>
+				<paper-toggle-button ng-model="boolean"></paper-toggle-button>
+			</div>
+		</div>
+		<hr/>
+		<p>Boolean values can be used to toggle core-overlay, paper-dialog and paper-toast on and off. The two way binding means that hiding these elements will also set the bound value to false.</p>
+		<div class="row">
+			<div class="col-sm-6">
+				<pre ng-non-bindable class="prettyprint">&lt;paper-button label="Dialog" ng-click="dialog=true"&gt;&lt;/paper-button&gt;
+&lt;span&gt;Dialog opened: {{dialog}}&lt;/span&gt;
+&lt;paper-dialog ng-opened="dialog" heading="Paper Dialog" layered&gt;
+	&lt;!-- dialog content --&gt;
+&lt;/paper-dialog&gt;
+
+&lt;paper-button label="Toast" ng-click="toast=true"&gt;&lt;/paper-button&gt;
+&lt;span&gt;Toast opened: {{toast}}&lt;/span&gt;
+&lt;paper-toast ng-opened="toast" text="This is a toast"&gt;&lt;/paper-toast&gt;</pre>
+			</div>
+			<div class="col-sm-6" id="openable-example">
+				<div horizontal centered layout>
+					<paper-button label="Dialog" ng-click="dialog=true" raisedButton></paper-button>
+					<span>Dialog opened: {{dialog}}</span>
+					<paper-dialog ng-opened="dialog" heading="Paper Dialog" layered>
+						<div style="background-color:#fff; padding: 10px">
+							<p>Some content goes here</p>
+						</div>
+					</paper-dialog>
+				</div>
+				<div horizontal centered layout>
+					<paper-button label="Toast" ng-click="toast=true" raisedButton></paper-button>
+					<span>Toast opened: {{toast}}</span>
+					<paper-toast ng-opened="toast" text="This is a toast"></paper-toast>
+				</div>
+			</div>
+		</div>
+		<hr/>
+		<p>Support for core-list allows you to bind an array of items to be shown, and to bind an event to get the item the user clicked/tapped on. Add the <code>$event</code> parameter to your event handler call and get the selected item from <code>$event.detail.data</code>:</p>
+		<div class="row">
+			<div class="col-sm-6">
+				<pre ng-non-bindable class="prettyprint">&lt;core-list ng-model="list" ng-tap="onSelect($event)"&gt;
+   &lt;template&gt;
+      &lt;div&gt;{{name}}&lt;/div&gt;
+   &lt;/template&gt;
+&lt;/core-list&gt;</pre>
+				<pre class="prettyprint">$scope.list = [{name:'One'},{name:'Two'},{name:'Three'}];
+
+$scope.onSelect = function(event) {
+   var selected = event.detail.data;
+   alert('Selected: ' + selected.name);
+};</pre>
+			</div>
+			<div class="col-sm-6" ng-controller="ListExampleCtrl as ctrl">
+				<core-list ng-model="ctrl.list" ng-tap="ctrl.onSelect($event)">
+					<template>
+						<div style="border:1px solid #ddd; margin:5px;padding:5px;cursor:pointer">{{name}}</div>
+					</template>
+				</core-list>
+			</div>
+		</div>
+		<hr/>
+		<h3>How do I use it with other custom elements?</h3>
+		<p>ng-polymer-elements uses a simple structure to map directive attributes to custom element properties. You can extend the mapping by setting <code>window.NG_POLYMER_ELEMENTS_EXTENDED_MAPPINGS</code> with your own mappings <strong>before</strong> <code>ng-polymer-elements[.min].js</code> is invoked.</p>
+		<p>The mapping structure is an object where the keys are the directive names, and their values are objects that contain a key for each directive attribute you want to map. The values for the directives are objects containing a single entry where the key is the type (<code>primitive</code>, <code>array</code>, <code>object</code> or <code>event</code>) and the value is the custom element property.</p>
+		<p>Consider the mappings for core-input and core-list:</p>
+		<pre class="prettyprint">window.NG_POLYMER_ELEMENTS_EXTENDED_MAPPINGS = {
+   coreInput: {
+      ngModel: {
+         primitive: 'inputValue'
+      }
+   },
+   coreList: {
+      ngModel: {
+         array: 'data'
+      },
+      ngTap: {
+         event: 'core-activate'
+      }
+   }
+};</pre>
+		<p>For core-input (coreInput) we map the ng-model attribute to the inputValue property as a primitive (string in this case). 
+		For core-list (coreList) we map the ng-model attribute to the data property as an array, and the ng-tap attribute to the core-activated event.
+		when mapping events, the original event will be available to AngularJS handlers as the <code>$event</code> parameter.</p>
+	</div>
+	<script src="bower_components/google-code-prettify/bin/prettify.min.js"></script>
+	<script src="bower_components/angular/angular.min.js"></script>
+	<script src="bower_components/ng-polymer-elements/ng-polymer-elements.min.js"></script>
+	<script>
+	
+		prettyPrint();
+		
+		angular.module('ng-polymer-elements-example', ['ng-polymer-elements'])
+			.controller('PlainExampleCtrl', function() {
+				
+				this.buttonLabel = 'Click me';
+				
+				this.buttonAction = function() {
+					alert('Button clicked');
+				};
+			})
+			.controller('ListExampleCtrl', function() {
+				
+				this.list = [{name:'One'},{name:'Two'},{name:'Three'}];
+				
+				this.onSelect = function(event) {
+					var selected = event.detail.data;
+					alert('Selected: ' + selected.name);
+				};
+			});
+	</script>
+	<script src="https://apis.google.com/js/platform.js" async defer></script>
+	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</body>
+</html>

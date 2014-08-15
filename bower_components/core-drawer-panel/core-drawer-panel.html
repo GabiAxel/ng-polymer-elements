@@ -1,0 +1,273 @@
+<!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<!--
+`core-drawer-panel` contains a drawer panel and a main panel.  The drawer
+and the main panel are side-by-side with drawer on the left.  When browser
+window size is smaller than the `responsiveWidth`, `core-drawer-panel` 
+changes to narrow layout.  In narrow layout, the drawer will be stacked on top
+of the main panel.  The drawer will be slided in/out to hide/reveal the main
+panel.
+
+Use the attribute `drawer` to indicate the element is a drawer panel and
+`main` to indicate is a main panel.
+
+Example:
+
+    <core-drawer-panel>
+      <div drawer> Drawer panel... </div>
+      <div main> Main panel... </div>
+    </core-drawer-panel>
+    
+The drawer and the main panels are not scrollable.  You can set CSS overflow
+property on the elements to make them scrollable or use `core-header-panel`.
+
+Example:
+
+    <core-drawer-panel>
+      <core-header-panel drawer>
+        <core-toolbar></core-toolbar>
+        <div> Drawer content... </div>
+      </core-header-panel>
+      <core-header-panel main>
+        <core-toolbar></core-toolbar>
+        <div> Main content... </div>
+      </core-header-panel>
+    </core-drawer-panel>
+    
+To position the drawer to the right, add `rightDrawer` attribute.
+
+    <core-drawer-panel rightDrawer>
+      <div drawer> Drawer panel... </div>
+      <div main> Main panel... </div>
+    </core-drawer-panel>
+
+@group Polymer Core Elements
+@element core-drawer-panel
+@homepage github.io
+-->
+
+<link rel="import" href="../core-media-query/core-media-query.html">
+<link rel="import" href="../core-selector/core-selector.html">
+
+<polymer-element name="core-drawer-panel" touch-action="auto">
+<template>
+
+  <link rel="stylesheet" href="core-drawer-panel.css">
+
+  <core-media-query query="max-width: {{responsiveWidth}}" queryMatches="{{queryMatches}}"></core-media-query>
+
+  <core-selector class="{{ {'narrow-layout' : queryMatches, transition : transition, dragging : dragging, 'right-drawer': rightDrawer} | tokenList }}" valueattr="id" selected="{{selected}}">
+
+    <div id="main" _style="left: {{ narrow || rightDrawer ? '0' : drawerWidth }}; right: {{ rightDrawer ? (narrow ? '' : drawerWidth) : '' }};">
+      <content select="[main]"></content>
+      <div id="scrim" on-tap="{{togglePanel}}"></div>
+    </div>
+    
+    <div id="drawer" _style="width: {{ drawerWidth }}">
+      <content select="[drawer]"></content>
+    </div>
+
+  </core-selector>
+
+</template>
+<script>
+
+  Polymer('core-drawer-panel', {
+    /**
+     * Fired when the narrow layout changes.
+     * 
+     * @event core-responsive-change
+     * @param {Object} detail
+     * @param {boolean} detail.narrow true if the panel is in narrow layout.
+     */
+
+    publish: {
+      
+      /**
+       * Width of the drawer panel.
+       *
+       * @attribute drawerWidth
+       * @type string
+       * @default '256px'
+       */
+      drawerWidth: '256px',
+      
+      /**
+       * Max-width when the panel changes to narrow layout.
+       *
+       * @attribute responsiveWidth
+       * @type string
+       * @default '640px'
+       */
+      responsiveWidth: '640px',
+      
+      /**
+       * The panel that is being selected. `drawer` for the drawer panel and
+       * `main` for the main panel.
+       *
+       * @attribute selected
+       * @type string
+       * @default null
+       */
+      selected: {value: null, reflect: true},
+      
+      /**
+       * The panel to be selected when `core-drawer-panel` changes to narrow 
+       * layout.
+       *
+       * @attribute defaultSelected
+       * @type string
+       * @default 'main'
+       */
+      defaultSelected: 'main',
+    
+      /**
+       * Returns true if the panel is in narrow layout.  This is useful if you
+       * need to show/hide elements based on the layout.
+       *
+       * @attribute narrow
+       * @type boolean
+       * @default false
+       */
+      narrow: {value: false, reflect: true},
+      
+      /**
+       * If true, position the drawer to the right.
+       *
+       * @attribute rightDrawer
+       * @type boolean
+       * @default false
+       */
+      rightDrawer: false,
+      
+      /**
+       * If true, swipe to open/close the drawer is disabled.
+       *
+       * @attribute disableSwipe
+       * @type boolean
+       * @default false
+       */
+      disableSwipe: false
+    },
+    
+    eventDelegates: {
+      trackstart: 'trackStart',
+      trackx: 'trackx',
+      trackend: 'trackEnd'
+    },
+    
+    transition: false,
+
+    edgeSwipeSensitivity : 15,
+    
+    dragging : false,
+    
+    domReady: function() {
+      // to avoid transition at the beginning e.g. page loads
+      // NOTE: domReady is already raf delayed and delaying another frame
+      // ensures a layout has occurred.
+      this.async(function() {
+        this.transition = true;
+      });
+    },
+
+    /**
+     * Toggles the panel open and closed.
+     * 
+     * @method togglePanel
+     */
+    togglePanel: function() {
+      this.selected = this.selected === 'main' ? 'drawer' : 'main';
+    },
+    
+    /**
+     * Opens the drawer.
+     * 
+     * @method openDrawer
+     */
+    openDrawer: function() {
+      this.selected = 'drawer';
+    },
+    
+    /**
+     * Closes the drawer.
+     * 
+     * @method closeDrawer
+     */
+    closeDrawer: function() {
+      this.selected = 'main';
+    },
+
+    queryMatchesChanged: function() {
+      if (this.queryMatches) {
+        this.selected = this.defaultSelected;
+      }
+      this.narrow = this.queryMatches;
+      this.setAttribute('touch-action', 
+          this.narrow && !this.disableSwipe ? 'pan-y' : '');
+      this.fire('core-responsive-change', {narrow: this.narrow});
+    },
+    
+    // swipe support for the drawer, inspired by
+    // https://github.com/Polymer/core-drawer-panel/pull/6
+    trackStart : function(e) {
+      if (this.narrow && !this.disableSwipe) {
+        this.dragging = true;
+
+        if (this.selected === 'main') {
+          this.dragging = this.rightDrawer ?
+              e.pageX >= this.offsetWidth - this.edgeSwipeSensitivity :
+              e.pageX <= this.edgeSwipeSensitivity;
+        }
+
+        if (this.dragging) {
+          this.width = this.$.drawer.offsetWidth;
+          this.transition = false;
+          e.preventTap();
+        }
+      }
+    },
+
+    trackx : function(e) {
+      if (this.dragging) {
+        var x;
+        if (this.rightDrawer) {
+          x = Math.max(0, (this.selected === 'main') ? this.width + e.dx : e.dx);
+        } else {
+          x = Math.min(0, (this.selected === 'main') ? e.dx - this.width : e.dx);
+        }
+        this.moveDrawer(x);
+      }
+    },
+
+    trackEnd : function(e) {
+      if (this.dragging) {
+        this.dragging = false;
+        this.transition = true;
+        this.moveDrawer(null);
+
+        if (this.rightDrawer) {
+          this.selected = e.xDirection > 0 ? 'main' : 'drawer';
+        } else {
+          this.selected = e.xDirection > 0 ? 'drawer' : 'main';
+        }
+      }
+    },
+    
+    moveDrawer: function(translateX) {
+      var s = this.$.drawer.style;
+      s.webkitTransform = s.transform = 
+          translateX === null ? '' : 'translate3d(' + translateX + 'px, 0, 0)';
+    }
+
+  });
+
+</script>
+</polymer-element>
