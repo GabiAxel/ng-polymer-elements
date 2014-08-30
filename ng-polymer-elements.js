@@ -33,7 +33,7 @@
     };
     
     var openableMappings = {
-    	ngOpened: {
+    	ngOpen: {
     		primitive: 'opened'
     	}
     };
