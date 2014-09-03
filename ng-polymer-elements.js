@@ -185,7 +185,10 @@
     // The following code removes any automated bootstrap definition and runs 
     // manual bootstrap instead.
     
-    document.querySelectorAll('[ng-app]').array().forEach(function(element) {
+    var appElements =  document.querySelectorAll('[ng-app]');
+    var appElementsArray = appElements.length > 0 ? appElements.array() : [];
+
+    appElementsArray.forEach(function(element) {
     	var app = element.getAttribute('ng-app');
     	element.removeAttribute('ng-app');
     	
