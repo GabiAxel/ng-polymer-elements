@@ -44,6 +44,7 @@
         paperRadioGroup: selectorMappings,
         paperTabs: selectorMappings,
         coreDropdown: selectorMappings,
+        paperDropdownMenu: selectorMappings,
         paperCheckbox: checkMappings,
         paperToggleButton: checkMappings,
         coreOverlay: openableMappings,
