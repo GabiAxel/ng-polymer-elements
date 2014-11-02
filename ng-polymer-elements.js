@@ -20,7 +20,11 @@
     var selectorMappings = {
     	ngModel: {
     		primitive: 'selected'
-    	}
+    	},
+	ngChange:
+        {
+            event: 'core-select'
+        }
     };
     
     var checkMappings = {
