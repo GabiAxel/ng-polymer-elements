@@ -20,7 +20,11 @@
     var selectorMappings = {
     	ngModel: {
     		primitive: 'selected'
-    	}
+    	},
+	ngChange:
+        {
+            event: 'core-select'
+        }
     };
     
     var checkMappings = {
@@ -44,6 +48,7 @@
         paperRadioGroup: selectorMappings,
         paperTabs: selectorMappings,
         coreDropdown: selectorMappings,
+        paperDropdownMenu: selectorMappings,
         paperCheckbox: checkMappings,
         paperToggleButton: checkMappings,
         coreOverlay: openableMappings,
