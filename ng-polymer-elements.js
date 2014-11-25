@@ -47,6 +47,7 @@
         paperCheckbox: checkMappings,
         paperToggleButton: checkMappings,
         coreOverlay: openableMappings,
+        paperActionDialog: openableMappings,
         paperDialog: openableMappings,
         paperToast: openableMappings,
         paperSlider: {
