@@ -177,6 +177,32 @@
             };
         }]);
     });
+	
+	module.service('$polymerOpen', function($http, $templateCache, $compile, $rootScope, $window) {
+		
+		return function(options) {
+			
+			$http.get(options.templateUrl, {cache: $templateCache})
+				.then(function(result) {
+					var template = result.data;
+					var scope = (options.scope || $rootScope.$new());
+					var el = $compile(template)(scope)[0];
+					var wrapper = $window.document.createElement('div');
+					
+					$window.document.body.appendChild(wrapper);
+					wrapper.appendChild(el);
+					el.opened = true;
+					var observer = new PathObserver(el, 'opened');
+					observer.open(function (value) {
+						if(!value) {
+							wrapper.remove();
+							observer.close();
+						}
+					});
+			});
+			
+		};
+	});
 
     // The directives need to be applied to the custom elements after Polymer
     // has been loaded and the elements upgraded. Because of this AngularJS
@@ -185,7 +211,7 @@
     // The following code removes any automated bootstrap definition and runs 
     // manual bootstrap instead.
     
-    document.querySelectorAll('[ng-app]').array().forEach(function(element) {
+	angular.forEach(document.querySelectorAll('[ng-app]'), function(element) {
     	var app = element.getAttribute('ng-app');
     	element.removeAttribute('ng-app');
     	
