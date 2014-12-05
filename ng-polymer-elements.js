@@ -45,6 +45,7 @@
         paperTabs: selectorMappings,
         coreDropdown: selectorMappings,
         paperCheckbox: checkMappings,
+        paperDropdown: checkMappings,
         paperToggleButton: checkMappings,
         coreOverlay: openableMappings,
         paperDialog: openableMappings,
