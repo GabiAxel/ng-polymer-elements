@@ -47,6 +47,7 @@
         paperToggleButton: checkMappings,
         coreOverlay: openableMappings,
         paperDialog: openableMappings,
+        paperActionDialog: openableMappings,
         paperToast: openableMappings,
         paperSlider: {
         	ngModel: {
