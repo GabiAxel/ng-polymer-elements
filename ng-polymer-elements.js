@@ -42,21 +42,15 @@
         paperInput: inputMappings,
         paperRadioGroup: selectorMappings,
         paperTabs: selectorMappings,
-        coreDropdown: selectorMappings,
+        coreSelector: selectorMappings,
+        coreMenu: selectorMappings,
         paperCheckbox: checkMappings,
         paperToggleButton: checkMappings,
         coreOverlay: openableMappings,
         paperDialog: openableMappings,
         paperActionDialog: openableMappings,
         paperToast: openableMappings,
-        paperSlider: {
-        	ngModel: {
-        		primitive: 'value'
-        	},
-            ngDisabled: {
-            	primitive: 'disabled'
-            }
-        },
+        paperSlider: inputMappings,
         coreList: {
             ngModel: {
                 array: 'data'
