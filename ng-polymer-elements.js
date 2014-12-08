@@ -10,7 +10,7 @@
 
     var inputMappings = {
         ngModel: {
-            primitive: 'inputValue'
+            primitive: 'value'
         },
         ngDisabled: {
         	primitive: 'disabled'
@@ -39,7 +39,6 @@
     };
 
     var allMappings = {
-        coreInput: inputMappings,
         paperInput: inputMappings,
         paperRadioGroup: selectorMappings,
         paperTabs: selectorMappings,
