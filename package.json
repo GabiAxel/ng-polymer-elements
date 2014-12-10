@@ -1,13 +1,45 @@
 {
-	"author": "Gabriel Axel <guznik@gmail.com>",
 	"name": "ng-polymer-elements",
 	"version": "0.2.0",
-	"devDependencies": {
+	"homepage": "http://gabiaxel.github.io/ng-polymer-elements/",
+	"repository": 
+	{
+		"type": "git",
+		"url": "git://github.com/GabiAxel/ng-polymer-elements.git"
+	},
+
+	"main": "ng-polymer-elements.js",
+	"keywords": 
+	[
+		"angular",
+		"angularjs",
+		"polymer",
+		"paper",
+		"web components"
+	],
+
+	"license": "MIT",
+	"author": 
+	{
+		"name": "Gabriel Axel",
+		"email": "guznik@gmail.com>",
+		"url": "http://www.gabiaxel.com"
+	},
+
+	"bugs": 
+	{
+		"url": "https://github.com/GabiAxel/ng-polymer-elements/issues"
+	},
+
+	"devDependencies": 
+	{
 		"grunt": "~0.4.1",
 		"grunt-contrib-uglify": "~0.2.5",
 		"grunt-contrib-jshint": "~0.7.0"
 	},
-	"engines":{
-		"node":"0.10.10"
+
+	"engines": 
+	{
+		"node": "0.10.10"
 	}
 }
