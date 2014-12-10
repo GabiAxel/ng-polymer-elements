@@ -1,69 +1,69 @@
 (function(angular) {
 
-    'use strict';
-    
-    // Each mapping is an object where the key is the directive/custom element
-    // name in camel case and the value is an object where the keys are the
-    // AngularJS attributes in camel case and the values are objects where the 
-    // key is the type which can be 'primitive', 'object', 'array' or 'event' 
-    // and the value is the name of the attribute in the web component.
-
-    var inputMappings = {
-        ngModel: {
-            primitive: 'value'
-        },
-        ngDisabled: {
-        	primitive: 'disabled'
-        }
-    };
-    
-    var selectorMappings = {
-    	ngModel: {
-    		primitive: 'selected'
-    	}
-    };
-    
-    var checkMappings = {
-    	ngModel: {
-    		primitive: 'checked'
-    	},
-        ngDisabled: {
-        	primitive: 'disabled'
-        }
-    };
-    
-    var openableMappings = {
-    	ngOpened: {
-    		primitive: 'opened'
-    	}
-    };
-
-    var allMappings = {
-        paperInput: inputMappings,
-        paperRadioGroup: selectorMappings,
-        paperTabs: selectorMappings,
-        coreSelector: selectorMappings,
-        coreMenu: selectorMappings,
-        paperCheckbox: checkMappings,
-        paperToggleButton: checkMappings,
-        coreOverlay: openableMappings,
-        paperDialog: openableMappings,
-        paperActionDialog: openableMappings,
-        paperToast: openableMappings,
-        paperSlider: inputMappings,
-        coreList: {
-            ngModel: {
-                array: 'data'
-            },
-            ngTap: {
-                event: 'core-activate'
-            }
-        }
-    };
-    
-    var module = angular.module('ng-polymer-elements', [])
+    angular.module('ng-polymer-elements', [])
     	.config(['$compileProvider', '$injector', function($compileProvider, $injector) {
+    		
+    		'use strict';
 
+    		// Each mapping is an object where the key is the directive/custom element
+    	    // name in camel case and the value is an object where the keys are the
+    	    // AngularJS attributes in camel case and the values are objects where the 
+    	    // key is the type which can be 'primitive', 'object', 'array' or 'event' 
+    	    // and the value is the name of the attribute in the web component.
+
+    	    var inputMappings = {
+    	        ngModel: {
+    	            primitive: 'value'
+    	        },
+    	        ngDisabled: {
+    	        	primitive: 'disabled'
+    	        }
+    	    };
+    	    
+    	    var selectorMappings = {
+    	    	ngModel: {
+    	    		primitive: 'selected'
+    	    	}
+    	    };
+    	    
+    	    var checkMappings = {
+    	    	ngModel: {
+    	    		primitive: 'checked'
+    	    	},
+    	        ngDisabled: {
+    	        	primitive: 'disabled'
+    	        }
+    	    };
+    	    
+    	    var openableMappings = {
+    	    	ngOpened: {
+    	    		primitive: 'opened'
+    	    	}
+    	    };
+
+    	    var allMappings = {
+    	        paperInput: inputMappings,
+    	        paperRadioGroup: selectorMappings,
+    	        paperTabs: selectorMappings,
+    	        coreSelector: selectorMappings,
+    	        coreMenu: selectorMappings,
+    	        paperCheckbox: checkMappings,
+    	        paperToggleButton: checkMappings,
+    	        coreOverlay: openableMappings,
+    	        paperDialog: openableMappings,
+    	        paperActionDialog: openableMappings,
+    	        paperToast: openableMappings,
+    	        paperSlider: inputMappings,
+    	        coreList: {
+    	            ngModel: {
+    	                array: 'data'
+    	            },
+    	            ngTap: {
+    	                event: 'core-activate'
+    	            }
+    	        }
+    	    };
+    		
     		// Extension point for overriding mappings
     		
     		if($injector.has('$ngPolymerMappings')) {
