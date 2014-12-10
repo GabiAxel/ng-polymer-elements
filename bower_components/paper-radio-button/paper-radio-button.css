@@ -89,10 +89,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   pointer-events: none;
 }
 
-:host([disabled]) #offRadio {
-  border-color: #eaeaea !important;
+:host([disabled]) #onRadio {
+  display: none;
 }
 
-:host([disabled]) #onRadio {
-  background-color: #eaeaea !important;
+:host([disabled]) #offRadio {
+  opacity: 0.33;
+  border-color: #5a5a5a;
+}
+
+:host([disabled][checked]) #offRadio {
+  opacity: 0.33;
+  background-color: #5a5a5a;
 }

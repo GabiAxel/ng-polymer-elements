@@ -7,82 +7,108 @@ license that can be found in the LICENSE file.
 <html>
   <head>
     <title>paper-icon-button</title>
-    <meta name="viewport" content="width=device-width; initial-scale=1.0; max-scale=1.0; user-scalable=yes">
-    <script src="../platform/platform.js"></script>
-    
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../webcomponentsjs/webcomponents.js"></script>
+
     <link rel="import" href="../core-icons/core-icons.html">
-    <link rel="import" href="../core-icons/maps-icons.html">
-    <link rel="import" href="../core-icons/social-icons.html">
-    <link rel="import" href="../core-selector/core-selector.html">
     <link rel="import" href="paper-icon-button.html">
 
     <style shim-shadowdom>
       body {
-        font-family: sans-serif;
+        font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+        font-size: 14px;
+        margin: 0;
+        padding: 24px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        -webkit-touch-callout: none;
       }
 
-      column {
-        display: inline-block;
-        max-width: 720px;
-      }
-      
       section {
-        margin: 1em;
+        padding: 20px 0;
       }
 
-      span {
-        display: inline-block;
-        text-align: right;
-        width: 6em;
-        margin-right: 1em;
+      section > div {
+        padding: 14px;
+        font-size: 16px;
       }
 
       paper-icon-button {
         vertical-align: middle;
       }
 
-      paper-icon-button.red::shadow core-icon {
-        fill: #fe774d;
+      paper-icon-button.hover:hover {
+        background: #eee;
+        border-radius: 50%;
       }
 
-      core-selector paper-icon-button:not([active])::shadow core-icon {
-        fill: #c9c9c9;
+      paper-icon-button.red {
+        color: #fe774d;
+      }
+
+      paper-icon-button.blueRipple::shadow #ripple {
+        color: #4285f4;
+      }
+
+/*      core-selector paper-icon-button:not([active])::shadow core-icon {
+        color: #c9c9c9;
+      }
+*/
+      paper-icon-button.custom {
+        color: #a9edff;
       }
     </style>
-    
+
   </head>
-  
-  <body unresolved layout horizontal center-justified>
+
+  <body unresolved onclick="clickAction(event);">
 
     <column>
-     
+
       <section>
-        <span>icon buttons</span>
-        <paper-icon-button icon="menu"></paper-icon-button>
-        <paper-icon-button icon="arrow-back"></paper-icon-button>
-        <paper-icon-button icon="arrow-forward"></paper-icon-button>
-        <paper-icon-button icon="check"></paper-icon-button>
-        <paper-icon-button icon="close"></paper-icon-button>
-        <paper-icon-button icon="fullscreen"></paper-icon-button>
-        <paper-icon-button icon="fullscreen-exit"></paper-icon-button>
-        <paper-icon-button icon="more-vert"></paper-icon-button>
-        <paper-icon-button icon="refresh"></paper-icon-button>
+
+        <div>Icon buttons</div>
+
+        <paper-icon-button icon="menu" title="menu"></paper-icon-button>
+        <paper-icon-button icon="arrow-back" title="arrow-back"></paper-icon-button>
+        <paper-icon-button icon="arrow-forward" title="arrow-forward"></paper-icon-button>
+        <paper-icon-button disabled icon="clear" title="clear"></paper-icon-button>
+
       </section>
-  
+
+      <br>
+
       <section>
-        <span>styled</span>
-        <paper-icon-button icon="favorite"></paper-icon-button>
-        <paper-icon-button class="red" icon="favorite"></paper-icon-button>
-        <paper-icon-button disabled onclick="alert('should not be clickable');" icon="favorite"></paper-icon-button>
+
+        <div>Styled</div>
+
+        <paper-icon-button icon="favorite" title="favorite"></paper-icon-button>
+        <paper-icon-button class="hover" icon="favorite" title="favorite"></paper-icon-button>
+        <paper-icon-button class="red" icon="favorite" title="favorite"></paper-icon-button>
+        <paper-icon-button class="red blueRipple" icon="favorite" title="favorite"></paper-icon-button>
+
       </section>
-  
+
+      <section>
+
+        <div>Link</div>
+
+        <a href="https://www.polymer-project.org" target="_blank">
+          <paper-icon-button icon="polymer" title="polymer"></paper-icon-button>
+        </a>
+
+      </section>
+
 <!--       <section>
         <span>focused</span>
         <paper-icon-button focused icon="social:cake"></paper-icon-button>
         <paper-icon-button focused icon="social:plus-one"></paper-icon-button>
       </section>
- -->  
-      <section>
+ -->
+<!--       <section>
         <span>segmented</span>
         <core-selector selected="1">
           <paper-icon-button fill isToggle icon="maps:directionswalk"></paper-icon-button>
@@ -91,12 +117,30 @@ license that can be found in the LICENSE file.
           <paper-icon-button fill isToggle icon="maps:directions-car"></paper-icon-button>
         </core-selector>
       </section>
-
+ -->
       <section>
-        <span>custom img</span>
-        <paper-icon-button iconSrc="https://assets-cdn.github.com/images/modules/logos_page/Octocat.png"></paper-icon-button>
+
+        <div>Custom icon src</div>
+
+        <paper-icon-button class="custom" src="https://assets-cdn.github.com/images/modules/logos_page/Octocat.png" aria-label="octocat" title="octocat"></paper-icon-button>
+
       </section>
     </column>
-    
+
+    <script>
+
+      function clickAction(e) {
+        var t = e.target;
+        if (t.localName === 'paper-icon-button') {
+          if (t.hasAttribute('disabled')) {
+            console.error('should not be able to click disabled button', t);
+          } else {
+            console.log('click', t);
+          }
+        }
+      }
+
+    </script>
+
   </body>
 </html>

@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <!--
 Copyright 2013 The Polymer Authors. All rights reserved.
 Use of this source code is governed by a BSD-style
@@ -9,11 +9,11 @@ license that can be found in the LICENSE file.
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
   <title>paper-fab</title>
 
-  <script src="../platform/platform.js"></script>
+  <script src="../webcomponentsjs/webcomponents.js"></script>
 
   <link href="../font-roboto/roboto.html" rel="import">
   <link href="../core-icons/core-icons.html" rel="import">
@@ -23,6 +23,7 @@ license that can be found in the LICENSE file.
 
     body {
       font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+      font-size: 14px;
       margin: 0;
       padding: 24px;
       -webkit-user-select: none;
@@ -31,12 +32,19 @@ license that can be found in the LICENSE file.
       user-select: none;
       -webkit-tap-highlight-color: rgba(0,0,0,0);
       -webkit-touch-callout: none;
-      transform: translateZ(0);
-      -webkit-transform: translateZ(0);
+    }
+
+    section {
+      padding: 20px 0;
+    }
+
+    section > div {
+      padding: 14px;
+      font-size: 16px;
     }
 
     paper-fab {
-      color: #FFF;
+      color: #fff;
       margin-right:2em;
     }
 
@@ -50,7 +58,6 @@ license that can be found in the LICENSE file.
 
     paper-fab.yellow {
       background: #ffeb3b;
-      color: #000;
     }
 
   </style>
@@ -58,15 +65,23 @@ license that can be found in the LICENSE file.
 </head>
 <body unresolved>
 
-  <h3>Regular</h3>
+  <section>
 
-  <paper-fab icon="arrow-forward"></paper-fab>
-  <paper-fab icon="create" class="blue"></paper-fab>
+    <div>Regular</div>
 
-  <h3>Mini</h3>
+    <paper-fab icon="arrow-forward" title="arrow-forward"></paper-fab>
+    <paper-fab icon="create" class="blue" title="create"></paper-fab>
 
-  <paper-fab icon="done" class="mini green"></paper-fab>
-  <paper-fab icon="reply" class="mini yellow"></paper-fab>
+  </section>
+
+  <section>
+
+    <div>Mini</div>
+
+    <paper-fab mini icon="done" class="green" title="done"></paper-fab>
+    <paper-fab mini icon="reply" class="yellow" title="reply"></paper-fab>
+
+  </section>
 
 </body>
 </html>

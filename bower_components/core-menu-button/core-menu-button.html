@@ -7,131 +7,75 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <!--
-/**
- * @module Polymer Core Elements
- */
-/**
- * core-menu-button is a core-icon-button with a drop down menu
- * that allows the user to select an option. The drop down menu is styled with
- * an arrow pointing to the button, and can be positioned to the top or the
- * bottom of the button with the valign property. The valign property aligns
- * the menu to the left or right edge of the button.
- *
- * Example:
- *
- *     <core-menu-button selected="0">
- *       <core-item icon="settings" label="Settings"></core-item>
- *       <core-item icon="dialog" label="Dialog"></core-item>
- *       <core-item icon="search" label="Search"></core-item>
- *     </core-menu-button>
- *
- * @class core-menu-button
- */
+
+`core-menu-button` works together with a button and `core-dropdown` to implement
+an button that displays a drop-down when tapped on.
+
+The child element with the class `dropdown` will be used as the drop-down
+menu. It should be a `core-dropdown` or other overlay element.
+
+Example:
+
+    <core-menu-button>
+        <core-icon-button icon="menu"></core-icon-button>
+        <core-dropdown class="dropdown" layered>
+            <core-menu>
+                <core-item>Share</core-item>
+                <core-item>Settings</core-item>
+                <core-item>Help</core-item>
+            </core-menu>
+        </core-dropdown>
+    </core-menu-button>
+
+@module Polymer Core Elements
+@element core-menu-button
+@extends core-dropdown-base
+@status beta
+@homepage github.io
 -->
+
 <link href="../polymer/polymer.html" rel="import">
-<link href="../core-icon-button/core-icon-button.html" rel="import">
-<link href="../core-menu/core-menu.html" rel="import">
-<link href="../core-overlay/core-overlay.html" rel="import">
+<link href="../core-a11y-keys/core-a11y-keys.html" rel="import">
+<link href="../core-dropdown/core-dropdown-base.html" rel="import">
 
-<polymer-element name="core-menu-button" attributes="icon label src selected opened halign valign valueattr multi inlineMenu">
-  <template>
-    <link rel="stylesheet" href="core-menu-button.css">
-    <core-overlay target="{{$.overlay}}" opened="{{opened}}" layered?="{{!inlineMenu}}"></core-overlay>
-    <core-icon-button id="button" on-tap="{{toggle}}" src="{{src}}" icon="{{icon}}" active="{{opened}}"><span>{{label}}</span></core-icon-button>
-    <div id="overlay" halign="{{halign}}" valign="{{valign}}">
-      <style>
-        #overlay {
-          position: absolute;
-          left: 0px;
-          top: 40px;
-          padding: 8px;
-          background: #fff;
-          border: 1px solid #ccc;
-          border-radius: 3px;
-          /* overlay styling must be complete */
-          font-size: 1rem;
-        }
+<polymer-element name="core-menu-button" extends="core-dropdown-base" relative>
+<template>
 
-        core-menu {
-          margin: 0;
-        }
+  <style>
+    :host {
+      display: inline-block;
+    }
 
-        #overlay[halign=right] {
-          left: auto;
-          right: 0px;
-        }
+    :host([disabled]) {
+      pointer-events: none;
+      color: #a8a8a8;
+    }
 
-        #overlay[valign=top] {
-          top: auto;
-          bottom: 40px;
-        }
-      </style>
-      <core-menu id="menu" selected="{{selected}}" selectedItem="{{selectedItem}}" selectedClass="{{selectedClass}}" valueattr="{{valueattr}}" multi="{{multi}}" on-core-select="{{closeAction}}">
-        <content select="*"></content>
-      </core-menu>
-    </div>
-  </template>
-  <script>
-    Polymer('core-menu-button', {
-      /**
-       * The icon to display.
-       * @attribute icon
-       * @type string
-       */
-      icon: 'dots',
-      src: '',
-      /**
-       * The index of the selected menu item.
-       * @attribute selected
-       * @type number
-       */
-      selected: '',
-      /**
-       * Set to true to open the menu.
-       * @attribute opened
-       * @type boolean
-       */
-      opened: false,
-      /**
-       * Set to true to cause the menu popup to be displayed inline rather 
-       * than in its own layer.
-       * @attribute inlineMenu
-       * @type boolean
-       */
-      inlineMenu: false,
-      /**
-       * Horizontally align the overlay with the button. Accepted values are
-       * ["left", "center", "right"].
-       * @attribute halign
-       * @type string
-       */
-      halign: 'center',
-      /**
-       * Display the overlay on top or below the button. Accepted values are
-       * ["top", "bottom"].
-       * @attribute valign
-       * @type string
-       */
-      valign: 'bottom',
-      multi: false,
-      closeAction: function() {
-        this.opened = false;
-      },
-      /**
-       * Toggle the opened state of the dropdown.
-       * @method toggle
-       */
-      toggle: function() {
-        this.opened = !this.opened;
-      },
-      /**
-       * The selected menu item.
-       * @property selection
-       * @type Node
-       */
-      get selection() {
-        return this.$.menu.selection;
-      }
-    });
-  </script>
+    polyfill-next-selector { content: ':host([disabled]) *'; }
+    :host([disabled]) ::content * {
+      pointer-events: none;
+    }
+  </style>
+
+  <core-a11y-keys target="{{}}" keys="enter space" on-keys-pressed="{{toggleOverlay}}"></core-a11y-keys>
+
+  <content></content>
+
+</template>
+<script>
+
+  Polymer({
+
+    overlayListeners: {
+      'core-overlay-open': 'openAction',
+      'core-activate': 'activateAction'
+    },
+
+    activateAction: function() {
+      this.opened = false;
+    }
+
+  });
+
+</script>
 </polymer-element>

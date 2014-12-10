@@ -1,6 +1,6 @@
 {
   "name": "ng-polymer-elements",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "authors": [
     "Gabriel Axel <guznik@gmail.com>"
   ],
@@ -22,17 +22,17 @@
   ],
   "dependencies": {
     "angular": "~1.3.0",
-    "polymer": "Polymer/polymer#~0.3.4"
+    "polymer": "Polymer/polymer#~0.5.1"
   },
   "devDependencies": {},
   "homepage": "https://github.com/GabiAxel/ng-polymer-elements",
-  "_release": "0.1.0",
+  "_release": "0.2.0",
   "_resolution": {
     "type": "version",
-    "tag": "0.1.0",
-    "commit": "8176e8a32937fc83093033e69fd39901eb32131c"
+    "tag": "0.2.0",
+    "commit": "49759767b9614d75bdd42c55d839405d169d25db"
   },
   "_source": "git://github.com/GabiAxel/ng-polymer-elements.git",
-  "_target": "0.1.0",
+  "_target": "0.2.0",
   "_originalSource": "ng-polymer-elements"
 }

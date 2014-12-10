@@ -37,12 +37,11 @@ or, if you would prefer to do it in CSS, just give `html`, `body`, and `core-scr
     }
 
 `core-scroll-header-panel` works well with `core-toolbar` but can use any element 
-that represents a header by adding a `core-header` class to it.  Use the attribute 
-or class `content` to delineate the content section.
+that represents a header by adding a `core-header` class to it.
 
     <core-scroll-header-panel>
       <core-toolbar>Header</core-toolbar>
-      <div content>Content goes here...</div>
+      <div>Content goes here...</div>
     </core-scroll-header-panel>
 
 @group Polymer Core Elements
@@ -57,9 +56,9 @@ or class `content` to delineate the content section.
 
   <link rel="stylesheet" href="core-scroll-header-panel.css">
 
-  <div id="mainContainer" on-scroll="{{scroll}}">
+  <div id="mainContainer">
   
-    <content id="mainContent" select="[content], .content"></content>
+    <content id="mainContent" select=":not(core-toolbar):not(.core-header)"></content>
     
   </div>
   
@@ -76,6 +75,7 @@ or class `content` to delineate the content section.
   
 </template>
 <script>
+(function() {
 
   Polymer('core-scroll-header-panel', {
     
@@ -147,6 +147,7 @@ or class `content` to delineate the content section.
        *
        * @attribute headerHeight
        * @type number
+       * @default 0
        */
       headerHeight: 0,
 
@@ -158,8 +159,20 @@ or class `content` to delineate the content section.
        *
        * @attribute condensedHeaderHeight
        * @type number
+       * @default 0
        */
-      condensedHeaderHeight: 0
+      condensedHeaderHeight: 0,
+      
+      /**
+       * By default, the top part of the header stays when the header is being
+       * condensed.  Set this to true if you want the top part of the header
+       * to be scrolled away.
+       *
+       * @attribute scrollAwayTopbar
+       * @type boolean
+       * @default false
+       */
+      scrollAwayTopbar: false
     },
 
     prevScrollTop: 0,
@@ -172,6 +185,15 @@ or class `content` to delineate the content section.
       'headerMargin fixed': 'setup'
     },
     
+    ready: function() {
+      this._scrollHandler = this.scroll.bind(this);
+      this.scroller.addEventListener('scroll', this._scrollHandler);
+    },
+    
+    detached: function() {
+      this.scroller.removeEventListener('scroll', this._scrollHandler);
+    },
+    
     domReady: function() {
       this.async('measureHeaderHeight');
     },
@@ -180,13 +202,25 @@ or class `content` to delineate the content section.
       return this.$.headerContent.getDistributedNodes()[0];
     },
     
+    /**
+     * Returns the scrollable element.
+     *
+     * @property scroller
+     * @type Object
+     */
     get scroller() {
       return this.$.mainContainer;
     },
     
+    /**
+     * Invoke this to tell `core-scroll-header-panel` to re-measure the header's
+     * height.
+     *
+     * @method measureHeaderHeight
+     */
     measureHeaderHeight: function() {
       var header = this.header;
-      if (this.header) {
+      if (header && header.offsetHeight) {
         this.headerHeight = header.offsetHeight;
       }
     },
@@ -243,7 +277,7 @@ or class `content` to delineate the content section.
     condenseHeader: function(y) {
       var reset = y == null;
       // adjust top bar in core-header so the top bar stays at the top
-      if (this.header.$ && this.header.$.topBar) {
+      if (!this.scrollAwayTopbar && this.header.$ && this.header.$.topBar) {
         this.translateY(this.header.$.topBar.style, 
             reset ? null : Math.min(y, this.headerMargin));
       }
@@ -265,8 +299,8 @@ or class `content` to delineate the content section.
     },
     
     translateY: function(s, y) {
-      s.transform = s.webkitTransform = y == null ? '' : 
-          'translate3d(0, ' + y + 'px, 0)';
+      var t = y == null ? '' : 'translate3d(0, ' + y + 'px, 0)';
+      setTransform(s, t);
     },
     
     scroll: function(event) {
@@ -285,10 +319,10 @@ or class `content` to delineate the content section.
       }
       
       if (!event || !this.fixed && y !== this.y) {
-        requestAnimationFrame(this.transformHeader.bind(this, y));
+        this.transformHeader(y);
       }
       
-      this.prevScrollTop = sTop;
+      this.prevScrollTop = Math.max(sTop, 0);
       this.y = y;
       
       if (event) {
@@ -297,6 +331,19 @@ or class `content` to delineate the content section.
     }
 
   });
+  
+  //determine proper transform mechanizm
+  if (document.documentElement.style.transform !== undefined) {
+    var setTransform = function(style, string) {
+      style.transform = string;
+    }
+  } else {
+    var setTransform = function(style, string) {
+      style.webkitTransform = string;
+    }
+  }
+
+})();
 
 </script>
 </polymer-element>

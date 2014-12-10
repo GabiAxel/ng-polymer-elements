@@ -13,7 +13,6 @@ license that can be found in the LICENSE file.
   user-select: none;
   -webkit-user-select: none;
   cursor: pointer;
-  overflow: hidden;
 }
 
 :host([disabled]) {
@@ -45,42 +44,58 @@ core-icon::shadow svg {
   fill: #c9c9c9;
 }
 
-#overlay {
-  display: block;
-	position: fixed;
-  border-radius: 3px;
+#dropdown {
+  background-color: transparent;
+  margin: 12px;
+  color: #000;
+  overflow: visible;
+}
+
+#menu {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin: 0;
 }
 
 .paper-menu-button-overlay-ink {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 40px;
-	height: 40px;
-	border-radius: 20px;
-  background: #fff;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
   opacity: 0;
   transform: scale(0);
   -webkit-transform: scale(0);
 }
 
 :host([halign="right"]) .paper-menu-button-overlay-ink {
-	left: auto;
-	right: 0;
+  left: auto;
+  right: 0;
+}
+
+:host([valign="bottom"]) .paper-menu-button-overlay-ink {
+  top: auto;
+  bottom: 0;
 }
 
 .paper-menu-button-overlay-bg {
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	border-radius: 3px;
-  background: #fff;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  border-radius: 3px;
   opacity: 0;
+  z-index: -1;
 }
 
-#menu {
-	position: relative;
-  margin: 0;
+:host([noTransition]) .paper-menu-button-overlay-bg {
+  opacity: 1;
+}
+
+.paper-menu-button-menu-container {
+  overflow: auto;
+  max-height: 100%;
+  max-width: 100%;
 }

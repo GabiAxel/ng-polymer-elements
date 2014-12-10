@@ -1,9 +1,9 @@
 {
 	"name": "ng-polymer-elements gh-pages",
 	"dependencies": {
-		"ng-polymer-elements": "0.1.0",
-		"core-elements": "Polymer/core-elements#0.3.5",
-		"paper-elements": "Polymer/paper-elements#0.3.5",
+		"ng-polymer-elements": "0.2.0",
+		"core-elements": "Polymer/core-elements#0.5.1",
+		"paper-elements": "Polymer/paper-elements#0.5.1",
 		"bootstrap": "3.2.0",
 		"fontawesome": "4.1.0",
 		"google-code-prettify": "1.0.2"

@@ -10,13 +10,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <html>
 <head>
 
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
   <title>core-toolbar</title>
 
-  <script src="../../platform/platform.js"></script>
+  <script src="../../webcomponentsjs/webcomponents.js"></script>
 
   <link rel="import" href="../../font-roboto/roboto.html">
   <link rel="import" href="../../core-icons/core-icons.html">
   <link rel="import" href="../../core-toolbar/core-toolbar.html">
+  <link rel="import" href="../../core-media-query/core-media-query.html">
   <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
 
   <style>
@@ -91,6 +94,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div flex class="middle indent">Title</div>
     <div flex class="bottom indent" style="font-size: 18px;">Title2</div>
   </core-toolbar>
+  
+  <core-media-query id="mediaQuery" query="max-width: 800px"></core-media-query>
+  
+  <script>
+  
+    document.querySelector('#mediaQuery').addEventListener('core-media-change',
+      function(e) {
+        document.body.classList.toggle('core-narrow', e.detail.matches);
+      });
+  
+  </script>
   
 </body>
 </html>

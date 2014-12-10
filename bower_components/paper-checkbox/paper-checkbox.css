@@ -13,7 +13,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 }
 
 :host(:focus) {
-  outline: none;
+  outline: 0;
 }
 
 #checkboxContainer {
@@ -258,5 +258,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 }
 
 :host([disabled]) #checkbox {
-  border-color: #eaeaea !important;
+  opacity: 0.33;
+  border-color: #5a5a5a;
 }

@@ -1,3 +1,12 @@
+<!--
+    @license
+    Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+    This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+    The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+    The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+    Code distributed by Google as part of the polymer project is also
+    subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
 <link href="../core-selector/core-selector.html" rel="import">
 
 <link href="transitions/hero-transition.html" rel="import">
@@ -162,7 +171,7 @@ Note that the container element of the page does not participate in the transiti
 Dynamically setting up transitions
 ----------------------------------
 
-An easy way to dynamically set up transitions dynamically is to use property binding on
+An easy way to set up transitions dynamically is to use property binding on
 the transition attributes. 
 
 Example:
@@ -204,7 +213,7 @@ Example:
 
     <core-animated-pages>
       <section id="page1"></section>
-      <nested-page id="page2"></section>
+      <nested-page id="page2"></nested-page>
     </core-animated-pages>
 
 @element core-animated-pages
@@ -309,7 +318,7 @@ Fired when a page transition completes.
         this.animating = null;
       }
 
-      Platform.flush();
+      Polymer.flush();
 
       if (this.transitioning.indexOf(src) === -1) {
         this.transitioning.push(src);
@@ -325,7 +334,7 @@ Fired when a page transition completes.
         src: src,
         dst: dst,
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
-      }
+      };
 
       // fire an event so clients have a chance to do something when the
       // new page becomes visible but before it draws.
@@ -413,8 +422,8 @@ Fired when a page transition completes.
       if (oldItem && this.selectedItem) {
         // TODO(sorvell): allow bindings to update first?
         var self = this;
-        Platform.flush();
-        Platform.endOfMicrotask(function() {
+        Polymer.flush();
+        Polymer.endOfMicrotask(function() {
           self.applyTransition(oldItem, self.selectedItem);
         });
       }

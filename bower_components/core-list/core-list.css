@@ -1,20 +1,27 @@
 :host {
   display: block;
-  overflow: auto;
-  /*-webkit-overflow-scrolling: touch;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);*/
+  outline: none;
+  position: relative;
 }
 
-.core-list-viewport > * {
-  overflow: hidden;
+polyfill-next-selector { content: '.core-list-viewport > *'; }
+::content > * {
+  position: absolute;
+  top: 0;
+  box-sizing: border-box;
+  opacity: 0;
 }
 
-.core-list-viewport.horizontal {
+polyfill-next-selector { content: ':host(:not([grid])) .core-list-viewport > *'; }
+:host(:not([grid])) ::content > * {
+  width: 100%;
+}
+
+.core-list-items.horizontal {
   height: 100%;
   white-space: nowrap;
 }
 
-.core-list-viewport.horizontal > * {
+.core-list-items.horizontal > * {
   display: inline-block;
 }
