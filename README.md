@@ -20,15 +20,31 @@ The project is available through Bower: `bower install ng-polymer-elements`
 
 Add the script `ng-polymer-elements.js` or `ng-polymer-elements.min.js` to your page.
 
-**Important** : ng-polymer-elements requires that the Polymer platform be loaded and ready before running AngularJS bootstrapping. If you are using autmatic bootstrapping (ng-app="myModule" in your HTML) then ng-polymer-elements will handle this for you, but if you use manual bootstrapping you need to make sure it happens after the 'polymer-ready' event has been fired **and** wrap the target DOM element:
+**Important** : In older browsers, AngularJS should be bootstrapped only after the custom elements have been registered, and therefore you can't use automatic bootstrapping (ng-app="..."). You need to call angular.bootstrap() only after Polymer has been loaded, and with a wrapped DOM element:
 
 ```javascript
-window.addEventListener('polymer-ready', function() {
-    angular.bootstrap(wrap(document), ['myModule']);
-});
+function bootstrap() {
+   angular.bootstrap(wrap(document), ['myModule']);
+}
+        
+if(angular.isDefined(document.body.attributes['unresolved'])) {
+   var readyListener = function() {
+      bootstrap();
+      window.removeEventListener('polymer-ready', readyListener);
+   }
+   window.addEventListener('polymer-ready', readyListener);
+} else {
+   bootstrap();
+}
 ```
 
-Add the ng-polymer-elements module to your application dependencies:
+This is not needed if you are only targeting the latest Chrome and Opera, where you can simply use:
+
+```html
+<html ng-app="myModule>
+```
+
+Also add the ng-polymer-elements module to your application dependencies:
 
 ```javascript
 angular.module('myModule', ['ng-polymer-elements']);
@@ -36,60 +52,43 @@ angular.module('myModule', ['ng-polymer-elements']);
 
 ## Available Component Support
 
-The following components support two-way binding of primitive values using ng-model:
+The following Polymer elements are support:
 
-- [core-input](http://www.polymer-project.org/docs/elements/core-elements.html#core-input)
+- [core-list](http://www.polymer-project.org/docs/elements/core-elements.html#core-list)
+- [core-menu](http://www.polymer-project.org/docs/elements/core-elements.html#core-menu)
+- [core-overlay](http://www.polymer-project.org/docs/elements/core-elements.html#core-overlay)
+- [core-selector](http://www.polymer-project.org/docs/elements/core-elements.html#core-selector)
+- [paper-action-dialog](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-action-dialog)
+- [paper-checkbox](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-checkbox)
+- [paper-dialog](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-dialog)
 - [paper-input](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-input)
 - [paper-radio-group](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-radio-group)
-- [paper-tabs](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-tabs) (bind the index of the selected tab)
-- [paper-checkbox](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-checkbox)
-- [paper-toggle-button](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-toggle-button)
-- [core-overlay](http://www.polymer-project.org/docs/elements/core-elements.html#core-overlay) (bind the opened state)
-- [paper-dialog](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-dialog) (bind the opened state)
-- [paper-toast](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-toast) (bind the opened state)
 - [paper-slider](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-slider)
+- [paper-tabs](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-tabs)
+- [paper-toast](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-toast)
+- [paper-toggle-button](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-toggle-button)
 
-For [core-list](http://www.polymer-project.org/docs/elements/core-elements.html#core-list) ng-model is used to bind the list data, and ng-tap is used to bind the tap event, and exposes the event as "$event".
-
-```html
-<core-list ng-model="arrayData" ng-tap="onTap($event)">
-    <template>
-        <div>{{text}}</div>
-    </template>
-</core-list>
-```
-
-```javascript
-$scope.arrayData = [{text: 'one'}, {text: 'two'}, {text: 'three'}];
-
-$scope.onTap = function(event) {
-    var tappedItem = event.details.data;
-};
-```
-
-See  /example/index.html for coverage of most supported components.
+See [documentation](http://gabiaxel.github.io/ng-polymer-elements/) for usage examples.
 
 ## Supporting Additional Components
 
-You can easily add mapping for additional components, or change the provided mappings, by setting `window.NG_POLYMER_ELEMENTS_EXTENDED_MAPPINGS` with the new mapping definition object. The keys in the top level are the names of the directives (which are the same as the web components) in camel case. The values are object containing a key for each attribute that will be used to bind AngularJS models, and the value of each such key is an object with a single entry where the key is the type (primitive, object, array or event) and the value is the web component's property to bind.
+ng-polymer-elements uses a simple structure to map directive attributes to custom element properties. You can extend the mapping by setting the `$ngPolymerMappings` constant in the `ng-polymer-elements` module with your mappings.
 
-In the following example we add support for my-component, with binding of the value in the "ng-model" attribute to my-component's "itemValue", and the event in the "ng-click" attribute to my-component's "item-clicked" event:
+The mapping structure is an object where the keys are the directive names, and their values are objects that contain a key for each directive attribute you want to map. The values for the directives are objects containing a single entry where the key is the type (`primitive`, `array`, `object` or `event`) and the value is the custom element property.
 
 ```javascript
-window.NG_POLYMER_ELEMENTS_EXTENDED_MAPPINGS = {
-    myComponent: {
-        ngModel: {
-            primitive: 'itemValue'
-        },
-        ngClick: {
-            event: 'item-clicked'
-        }
-    }
-};
+angular.module('ng-polymer-elements').constant('$ngPolymerMappings', {
+   newElement: {
+      anAttribute: {
+         primitive: 'an-attribute'
+      },
+      anEvent: {
+         event: 'an-event'
+      }
+   }
+});
 ```
 
-The above definition will allow us to write the following:
+In this example we add support for new-element and map an-attribute as a primitive value an an-event as an event. When mapping events, the original event will be available to AngularJS handlers as the $event parameter.
 
-```html
-<my-component ng-model="someValue" ng-click="doSomething($event)"></my-component>
-```
+See `allMappings` in [ng-polymer-elements.js](https://github.com/GabiAxel/ng-polymer-elements/blob/master/ng-polymer-elements.js) for default mappings.
