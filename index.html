@@ -166,13 +166,13 @@ if(angular.isDefined(document.body.attributes['unresolved'])) {
 }</pre>
 		<p>This is not needed for the latest versions of Chrome and Opera, and if you are only targeting these browsers you may use automatic bootstrapping.</p>
 		<p>
-			Also remember to include the Polymer platform script and any imports you use in your HTML head, and to add the <code>unresolved</code> attribute to your HTML body.
+			Also remember to include the Webcomponents polyfill script and any imports you use in your HTML head, and to add the <code>unresolved</code> attribute to your HTML body.
 			The general structure of your HTML should be like so:
 		</p>
 		<pre class="prettyprint">&lt;!DOCTYPE html&gt;
 &lt;html ng-app="myModule"&gt;
    &lt;head&gt;
-      &lt;script src="platform.js"&gt;&lt;/script&gt;
+      &lt;script src="webcomponents.js"&gt;&lt;/script&gt;
       &lt;!-- your imports here --&gt;
    &lt;/head&gt;
    &lt;body unresolved&gt;
