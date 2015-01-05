@@ -52,7 +52,7 @@ angular.module('myModule', ['ng-polymer-elements']);
 
 ## Available Component Support
 
-The following Polymer elements are support:
+The following Polymer elements are supported:
 
 - [core-list](http://www.polymer-project.org/docs/elements/core-elements.html#core-list)
 - [core-menu](http://www.polymer-project.org/docs/elements/core-elements.html#core-menu)
