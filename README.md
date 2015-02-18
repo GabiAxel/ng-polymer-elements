@@ -41,7 +41,7 @@ if(angular.isDefined(document.body.attributes['unresolved'])) {
 This is not needed if you are only targeting the latest Chrome and Opera, where you can simply use:
 
 ```html
-<html ng-app="myModule>
+<html ng-app="myModule">
 ```
 
 Also add the ng-polymer-elements module to your application dependencies:
