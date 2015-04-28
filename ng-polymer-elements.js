@@ -1,6 +1,18 @@
 (function(angular) {
 
     angular.module('ng-polymer-elements', [])
+    .constant('$ngPolymerMappings', {
+    		mmDropdown: {
+    			ngModel: {
+    				primitive: 'value'
+    			}
+    		},
+    		mmInput: {
+    			ngModel: {
+    				primitive: 'value'
+    			}
+    		}
+    	})
     	.config(['$compileProvider', '$injector', function($compileProvider, $injector) {
     		
     		'use strict';
