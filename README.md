@@ -2,11 +2,11 @@
 
 ## Introduction
 
-Web components make is possible to write encapsulated pieces of view and logic independently from any framework. The Polymer project contains a platform for pollyfilling and writing web components, and two sets of web components: core elements and paper elements.
+Web components make it possible to write encapsulated pieces of view and logic independently from any framework. The Polymer project contains a platform for pollyfilling and writing web components, and two sets of web components: core elements and paper elements.
 
 Although there are many similarities between the ways AngularJS and Polymer implement two-way binding, it's not possible to use two-way binding of AngularJS model with web components out of the box, and even one-way binding is limited only to strings.
 
-ng-polymer-elements overcomes this by applying directived to Polymer web components, and each directive is in charge of mapping attributes that reference AngularJS models to the web component's properties.
+ng-polymer-elements overcomes this by applying directives to Polymer web components, and each directive is in charge of mapping attributes that reference AngularJS models to the web component's properties.
 
 For example, the following code binds the scope's "myText" property to Polymer's paper-input "inputValue" property using the ng-model attribute, very similarly to how it looks for a basic text input:
 
