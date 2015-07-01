@@ -1,0 +1,150 @@
+body {
+  background: #eee;
+  color: #222;
+  font: 13px/1.3 'Open Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #333;
+  box-sizing: border-box;
+  color: #eee;
+  display: table;
+  padding: 1.2em 1.5em;
+  width: 100%;
+}
+header > h1 {
+  display: table-cell;
+  font-size: 1.667em;
+  font-weight: 400;
+  margin: 0;
+  vertical-align: middle;
+  width: 100%;
+}
+header > h1 em {
+  font-weight: 300;
+  font-size: .8em;
+  font-style: normal;
+  margin-left: .5em;
+  opacity: .6;
+}
+header > google-signin {
+  display: table-cell;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/**
+ * .control styles.
+ */
+ google-analytics-view-selector::shadow .control,
+ google-analytics-date-selector::shadow .control {
+  display: inline-block;
+  margin: 0 1em 1.5em 0;
+}
+google-analytics-view-selector::shadow .control:last-child,
+google-analytics-date-selector::shadow .control:last-child {
+  margin-right: 0;
+}
+google-analytics-view-selector::shadow .control > label,
+google-analytics-date-selector::shadow .control > label {
+  display: block;
+  padding: 0 0 .4em 2px;
+}
+
+/**
+ * Common styles.
+ */
+google-analytics-view-selector,
+google-analytics-date-selector {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  float: left;
+  margin: 0 1.5em 1.5em 0;
+  padding: 1.5em 1.5em 0;
+}
+google-analytics-chart {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  float: left;
+  margin: 0 1.5em 1.5em 0;
+  padding: 1.5em;
+  position: relative;
+  transition: opacity .2s ease;
+}
+google-analytics-chart:not([rendered]) {
+  display: none;
+}
+
+google-analytics-chart:first-of-type {
+  clear: both;
+}
+google-analytics-chart h3 {
+  border: 0;
+  font-size: 1.3em;
+  font-weight: 300;
+  margin: 0;
+  padding: 0;
+}
+
+
+/**
+ * <google-analytics-view-selector> styles.
+ */
+google-analytics-dashboard {
+  display: block;
+  padding: 1.5em;
+  transition: opacity .3s ease;
+}
+google-analytics-dashboard:not([authorized]) {
+  opacity: .4;
+  pointer-events: none;
+}
+
+/**
+ * <google-analytics-view-selector> styles.
+ */
+google-analytics-view-selector::shadow label {
+  font-weight: bold;
+}
+google-analytics-view-selector::shadow select {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  height: 34px;
+  line-height: 20px;
+  min-width: 160px;
+  padding: 6px 12px;
+}
+google-analytics-view-selector::shadow select:focus {
+  border-color: #4d90fe;
+  outline: 0;
+}
+google-analytics-view-selector::shadow label {
+  font-weight: bold;
+}
+
+/**
+ * <google-analytics-date-selector> styles.
+ */
+google-analytics-date-selector::shadow label {
+ font-weight: bold;
+}
+google-analytics-date-selector::shadow input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font: inherit;
+  font-weight: 400;
+  height: 34px;
+  line-height: 20px;
+  min-width: 160px;
+  padding: 6px;
+}
+google-analytics-date-selector::shadow input:focus {
+  border-color: #4d90fe;
+  outline: 0;
+}

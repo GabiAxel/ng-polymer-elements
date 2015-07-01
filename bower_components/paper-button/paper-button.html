@@ -1,14 +1,19 @@
 <!--
-Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE
+The complete set of authors may be found at http://polymer.github.io/AUTHORS
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS
 Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS
 -->
 
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-material/paper-material.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../paper-behaviors/paper-button-behavior.html">
+
 <!--
-@group Paper Elements
 
 Material Design: <a href="http://www.google.com/design/spec/components/buttons.html">Buttons</a>
 
@@ -26,12 +31,11 @@ You may use custom DOM in the button body to create a variety of buttons. For ex
 create a button with an icon and some text:
 
     <paper-button>
-      <core-icon icon="favorite"></core-icon>
+      <iron-icon icon="favorite"></iron-icon>
       custom button content
     </paper-button>
 
-Styling
--------
+### Styling
 
 Style the button with CSS as you would a normal DOM element.
 
@@ -45,136 +49,129 @@ By default, the ripple is the same color as the foreground at 25% opacity. You m
 customize the color using this selector:
 
     /* make #my-button use a blue ripple instead of foreground color */
-    #my-button::shadow #ripple {
+    #my-button::shadow paper-ripple {
       color: blue;
     }
 
 The opacity of the ripple is not customizable via CSS.
 
-@element paper-button
-@extends paper-button-base
-@status unstable
+The following custom properties and mixins are also available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-button-flat-focus-color` | Background color of a focused flat button | `--paper-grey-200`
+`--paper-button` | Mixin applied to the button | `{}`
+`--paper-button-disabled` | Mixin applied to the disabled button | `{}`
+
+@demo demo/index.html
 -->
 
-<link href="../polymer/polymer.html" rel="import">
-<link href="../paper-ripple/paper-ripple.html" rel="import">
-<link href="../paper-shadow/paper-shadow.html" rel="import">
+<dom-module id="paper-button">
 
-<link href="paper-button-base.html" rel="import">
+  <style>
 
-<polymer-element name="paper-button" extends="paper-button-base" attributes="raised recenteringTouch fill"
-role="button">
+    :host {
+      display: inline-block;
+      position: relative;
+      box-sizing: border-box;
+      min-width: 5.14em;
+      margin: 0 0.29em;
+      background: transparent;
+      text-align: center;
+      font: inherit;
+      text-transform: uppercase;
+      outline: none;
+      border-radius: 3px;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -webkit-user-select: none;
+      user-select: none;
+      cursor: pointer;
+      z-index: 0;
+
+      @apply(--paper-button);
+    }
+
+    .keyboard-focus {
+      font-weight: bold;
+    }
+
+    :host([disabled]) {
+      background: #eaeaea;
+      color: #a8a8a8;
+      cursor: auto;
+      pointer-events: none;
+
+      @apply(--paper-button-disabled);
+    }
+
+    :host([noink]) paper-ripple {
+      display: none;
+    }
+
+    paper-material {
+      border-radius: inherit;
+    }
+
+    .content > ::content * {
+      text-transform: inherit;
+    }
+
+    .content {
+      padding: 0.7em 0.57em
+    }
+  </style>
 
   <template>
 
-    <style>
+    <paper-ripple></paper-ripple>
 
-      :host {
-        display: inline-block;
-        position: relative;
-        box-sizing: border-box;
-        min-width: 5.14em;
-        margin: 0 0.29em;
-        background: transparent;
-        text-align: center;
-        font: inherit;
-        text-transform: uppercase;
-        outline: none;
-        border-radius: 3px;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        -webkit-user-select: none;
-        user-select: none;
-        cursor: pointer;
-        z-index: 0;
-      }
-
-      :host([disabled]) {
-        background: #eaeaea;
-        color: #a8a8a8;
-        cursor: auto;
-        pointer-events: none;
-      }
-
-      ::content * {
-        text-transform: inherit;
-      }
-
-      #shadow {
-        border-radius: inherit;
-      }
-
-      #ripple {
-        pointer-events: none;
-        z-index: -1;
-      }
-
-      .button-content {
-        padding: 0.7em 0.57em
-      }
-
-      polyfill-next-selector { content: '.button-content > a'; }
-      ::content > a {
-        height: 100%;
-        padding: 0.7em 0.57em;
-        /* flex */
-        -ms-flex: 1 1 0.000000001px;
-        -webkit-flex: 1;
-        flex: 1;
-        -webkit-flex-basis: 0.000000001px;
-        flex-basis: 0.000000001px;
-      }
-
-    </style>
-
-    <template if="{{raised}}">
-      <paper-shadow id="shadow" fit animated></paper-shadow>
-    </template>
-
-    <!-- this div is needed to position the ripple behind text content -->
-    <div class="button-content" relative layout horizontal center-center>
+    <paper-material class$="[[_computeContentClass(receivedFocusFromKeyboard)]]" elevation="[[_elevation]]" animated>
       <content></content>
-      {{label}}
-    </div>
+    </paper-material>
 
   </template>
 
-  <script>
-    Polymer({
+</dom-module>
 
-      publish: {
+<script>
 
-        /**
-         * If true, the button will be styled with a shadow.
-         *
-         * @attribute raised
-         * @type boolean
-         * @default false
-         */
-        raised: false,
+  Polymer({
 
-        /**
-         * By default the ripple emanates from where the user touched the button.
-         * Set this to true to always center the ripple.
-         *
-         * @attribute recenteringTouch
-         * @type boolean
-         * @default false
-         */
-        recenteringTouch: false,
+    is: 'paper-button',
 
-        /**
-         * By default the ripple expands to fill the button. Set this to true to
-         * constrain the ripple to a circle within the button.
-         *
-         * @attribute fill
-         * @type boolean
-         * @default true
-         */
-        fill: true
+    behaviors: [
+      Polymer.PaperButtonBehavior
+    ],
 
+    properties: {
+
+      /**
+       * If true, the button should be styled with a shadow.
+       */
+      raised: {
+        type: Boolean,
+        reflectToAttribute: true,
+        value: false,
+        observer: '_calculateElevation'
       }
+    },
 
-    });
-  </script>
-</polymer-element>
+    _calculateElevation: function() {
+      if (!this.raised) {
+        this._elevation = 0;
+      } else {
+        Polymer.PaperButtonBehaviorImpl._calculateElevation.apply(this);
+      }
+    },
+
+    _computeContentClass: function(receivedFocusFromKeyboard) {
+      var className = 'content ';
+      if (receivedFocusFromKeyboard) {
+        className += ' keyboard-focus';
+      }
+      return className;
+    }
+  });
+
+</script>

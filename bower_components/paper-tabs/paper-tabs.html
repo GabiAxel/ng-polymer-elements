@@ -1,5 +1,6 @@
 <!--
-Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
@@ -7,10 +8,20 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../iron-menu-behavior/iron-menubar-behavior.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-styles/color.html">
+<link rel="import" href="paper-tabs-icons.html">
+<link rel="import" href="paper-tab.html">
+
 <!--
-`paper-tabs` is a `core-selector` styled to look like tabs. Tabs make it easy to 
-explore and switch between different views or functional aspects of an app, or 
-to browse categorized data sets.
+`paper-tabs` makes it easy to explore and switch between different views or functional aspects of
+an app, or to browse categorized data sets.
 
 Use `selected` property to get or set the selected tab.
 
@@ -22,10 +33,10 @@ Example:
       <paper-tab>TAB 3</paper-tab>
     </paper-tabs>
 
-See <a href="#paper-tab">paper-tab</a> for more information about 
+See <a href="#paper-tab">paper-tab</a> for more information about
 `paper-tab`.
 
-A common usage for `paper-tabs` is to use it along with `core-pages` to switch
+A common usage for `paper-tabs` is to use it along with `iron-pages` to switch
 between different views.
 
     <paper-tabs selected="{{selected}}">
@@ -33,296 +44,440 @@ between different views.
       <paper-tab>Tab 2</paper-tab>
       <paper-tab>Tab 3</paper-tab>
     </paper-tabs>
-  
-    <core-pages selected="{{selected}}>
+
+    <iron-pages selected="{{selected}}">
       <div>Page 1</div>
       <div>Page 2</div>
       <div>Page 3</div>
-    </core-pages>
-    
-`paper-tabs` adapt to mobile/narrow layout when there is a `core-narrow` class set
-on itself or any of its ancestors.
+    </iron-pages>
 
-To use links in tabs, add `link` attribute to `paper-tabs` and put an `<a>`
+
+To use links in tabs, add `link` attribute to `paper-tab` and put an `<a>`
 element in `paper-tab`.
 
 Example:
 
-    <paper-tabs selected="0" link>
-      <paper-tab>
-        <a href="#link1" horizontal center-center layout>TAB ONE</a>
+    <paper-tabs selected="0">
+      <paper-tab link>
+        <a href="#link1" class="horizontal center-center layout">TAB ONE</a>
       </paper-tab>
-      <paper-tab>
-        <a href="#link2" horizontal center-center layout>TAB TWO</a>
+      <paper-tab link>
+        <a href="#link2" class="horizontal center-center layout">TAB TWO</a>
       </paper-tab>
-      <paper-tab>
-        <a href="#link3" horizontal center-center layout>TAB THREE</a>
+      <paper-tab link>
+        <a href="#link3" class="horizontal center-center layout">TAB THREE</a>
       </paper-tab>
     </paper-tabs>
 
-Styling tabs:
+### Styling
 
-To change the sliding bar color:
+The following custom properties and mixins are available for styling:
 
-    paper-tabs.pink::shadow #selectionBar {
-      background-color: #ff4081;
-    }
-    
-To change the ink ripple color:
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-tabs-selection-bar-color` | Color for the selection bar | `--paper-yellow-a100`
+`--paper-tabs` | Mixin applied to the tabs | `{}`
 
-    paper-tabs.pink paper-tab::shadow #ink {
-      color: #ff4081;
-    }
-
-@group Paper Elements
-@element paper-tabs
-@extends core-selector
-@homepage github.io
+@hero hero.svg
+@demo demo/index.html
 -->
 
-<link rel="import" href="../core-selector/core-selector.html">
-<link rel="import" href="../paper-icon-button/paper-icon-button.html">
-<link rel="import" href="paper-tab.html">
+<dom-module id="paper-tabs">
 
-<polymer-element name="paper-tabs" extends="core-selector" attributes="noink nobar noslide scrollable hideScrollButton" role="tablist" horizontal center layout>
-<template>
+  <style>
 
-  <link rel="stylesheet" href="paper-tabs.css">
-  
-  <div class="scroll-button" hidden?="{{!scrollable || hideScrollButton}}">
-    <paper-icon-button icon="chevron-left" class="{{ {hidden: leftHidden} | tokenList }}" on-down="{{holdLeft}}" on-up="{{releaseHold}}"></paper-icon-button>
-  </div>
-  
-  <div id="tabsContainer" class="{{ {scrollable: scrollable} | tokenList }}" flex on-scroll="{{scroll}}" on-trackstart="{{trackStart}}">
-  
-    <div id="tabsContent" horizontal layout?="{{!scrollable}}">
-      <shadow></shadow>
-      <div id="selectionBar" hidden?="{{nobar}}" on-transitionend="{{barTransitionEnd}}"></div>
+    :host {
+      @apply(--layout);
+      @apply(--layout-center);
+
+      height: 48px;
+      font-size: 14px;
+      font-weight: 500;
+      overflow: hidden;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+
+      @apply(--paper-tabs);
+    }
+
+    #tabsContainer {
+      position: relative;
+      height: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    #tabsContent {
+      height: 100%;
+    }
+
+    #tabsContent.scrollable {
+      position: absolute;
+      white-space: nowrap;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .not-visible {
+      opacity: 0;
+    }
+
+    paper-icon-button {
+      width: 24px;
+      padding: 16px;
+    }
+
+    #selectionBar {
+      position: absolute;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--paper-tabs-selection-bar-color, --paper-yellow-a100);
+      -webkit-transform-origin: left center;
+      transform-origin: left center;
+      -webkit-transform: scale(0);
+      transform: scale(0);
+      transition: -webkit-transform;
+      transition: transform;
+
+      @apply(--paper-tabs-selection-bar);
+    }
+
+    #selectionBar.align-bottom {
+      top: 0;
+      bottom: auto;
+    }
+
+    #selectionBar.expand {
+      transition-duration: 0.15s;
+      transition-timing-function: cubic-bezier(0.4, 0.0, 1, 1);
+    }
+
+    #selectionBar.contract {
+      transition-duration: 0.18s;
+      transition-timing-function: cubic-bezier(0.0, 0.0, 0.2, 1);
+    }
+
+    #tabsContent > ::content > *:not(#selectionBar) {
+      height: 100%;
+    }
+
+  </style>
+
+  <template>
+
+    <paper-icon-button icon="paper-tabs:chevron-left" class$="[[_computeScrollButtonClass(_leftHidden, scrollable, hideScrollButtons)]]" on-up="_onScrollButtonUp" on-down="_onLeftScrollButtonDown"></paper-icon-button>
+
+    <div id="tabsContainer" class="flex" on-scroll="_scroll">
+
+      <div id="tabsContent" class$="[[_computeTabsContentClass(scrollable)]]">
+
+        <content select="*"></content>
+
+        <div id="selectionBar" class$="[[_computeSelectionBarClass(noBar, alignBottom)]]"
+            on-transitionend="_onBarTransitionEnd"></div>
+
+      </div>
+
     </div>
-    
-  </div>
-  
-  <div class="scroll-button" hidden?="{{!scrollable || hideScrollButton}}">
-    <paper-icon-button icon="chevron-right" class="{{ {hidden: rightHidden} | tokenList }}" on-down="{{holdRight}}" on-up="{{releaseHold}}"></paper-icon-button>
-  </div>
-    
-</template>
+
+    <paper-icon-button icon="paper-tabs:chevron-right" class$="[[_computeScrollButtonClass(_rightHidden, scrollable, hideScrollButtons)]]" on-up="_onScrollButtonUp" on-down="_onRightScrollButtonDown"></paper-icon-button>
+
+  </template>
+
+</dom-module>
+
 <script>
 
-  Polymer('paper-tabs', {
-    
-    /**
-     * If true, ink ripple effect is disabled.
-     *
-     * @attribute noink
-     * @type boolean
-     * @default false
-     */
-    noink: false,
-    
-    /**
-     * If true, the bottom bar to indicate the selected tab will not be shown.
-     *
-     * @attribute nobar
-     * @type boolean
-     * @default false
-     */
-    nobar: false,
-    
-    /**
-     * If true, the slide effect for the bottom bar is disabled.
-     *
-     * @attribute noslide
-     * @type boolean
-     * @default false
-     */
-    noslide: false,
-    
-    /**
-     * If true, tabs are scrollable and the tab width is based on the label width.
-     *
-     * @attribute scrollable
-     * @type boolean
-     * @default false
-     */
-    scrollable: false,
-    
-    /**
-     * If true, dragging on the tabs to scroll is disabled.
-     *
-     * @attribute disableDrag
-     * @type boolean
-     * @default false
-     */
-    disableDrag: false,
-    
-    /**
-     * If true, scroll buttons (left/right arrow) will be hidden for scrollable tabs.
-     *
-     * @attribute hideScrollButton
-     * @type boolean
-     * @default false
-     */
-    hideScrollButton: false,
-    
-    activateEvent: 'tap',
-    
-    step: 10,
-    
-    holdDelay: 10,
-    
-    ready: function() {
-      this.super();
-      this._trackxHandler = this.trackx.bind(this);
-      Polymer.addEventListener(this.$.tabsContainer, 'trackx', this._trackxHandler);
-      this._tabsObserver = new MutationObserver(this.updateBar.bind(this));
-    },
-    
-    domReady: function() {
-      this.async('scroll');
-      this._tabsObserver.observe(this, {childList: true, subtree: true, characterData: true});
-    },
-    
-    detached: function() {
-      Polymer.removeEventListener(this.$.tabsContainer, 'trackx', this._trackxHandler);
-      this._tabsObserver.disconnect();
-    },
-    
-    trackStart: function(e) {
-      if (!this.scrollable || this.disableDrag) {
-        return;
+  Polymer({
+
+    is: 'paper-tabs',
+
+    behaviors: [
+      Polymer.IronResizableBehavior,
+      Polymer.IronMenubarBehavior
+    ],
+
+    properties: {
+
+      /**
+       * If true, ink ripple effect is disabled.
+       */
+      noink: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * If true, the bottom bar to indicate the selected tab will not be shown.
+       */
+      noBar: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * If true, the slide effect for the bottom bar is disabled.
+       */
+      noSlide: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * If true, tabs are scrollable and the tab width is based on the label width.
+       */
+      scrollable: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * If true, dragging on the tabs to scroll is disabled.
+       */
+      disableDrag: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * If true, scroll buttons (left/right arrow) will be hidden for scrollable tabs.
+       */
+      hideScrollButtons: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * If true, the tabs are aligned to bottom (the selection bar appears at the top).
+       */
+      alignBottom: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Gets or sets the selected element. The default is to use the index of the item.
+       */
+      selected: {
+        type: String,
+        notify: true
+      },
+
+      selectable: {
+        type: String,
+        value: 'paper-tab'
+      },
+
+      _step: {
+        type: Number,
+        value: 10
+      },
+
+      _holdDelay: {
+        type: Number,
+        value: 1
+      },
+
+      _leftHidden: {
+        type: Boolean,
+        value: false
+      },
+
+      _rightHidden: {
+        type: Boolean,
+        value: false
+      },
+
+      _previousTab: {
+        type: Object
       }
-      var t = e.target;
-      if (t && t.cancelRipple) {
-        t.cancelRipple();
-      }
-      this._startx = this.$.tabsContainer.scrollLeft;
-      e.preventTap();
     },
-    
-    trackx: function(e) {
-      if (!this.scrollable || this.disableDrag) {
-        return;
-      }
-      this.$.tabsContainer.scrollLeft = this._startx - e.dx;
+
+    hostAttributes: {
+      role: 'tablist'
     },
-    
-    scroll: function() {
+
+    listeners: {
+      'iron-resize': '_onResize',
+      'iron-select': '_onIronSelect',
+      'iron-deselect': '_onIronDeselect'
+    },
+
+    _computeScrollButtonClass: function(hideThisButton, scrollable, hideScrollButtons) {
+      if (!scrollable || hideScrollButtons) {
+        return 'hidden';
+      }
+
+      if (hideThisButton) {
+        return 'not-visible';
+      }
+
+      return '';
+    },
+
+    _computeTabsContentClass: function(scrollable) {
+      return scrollable ? 'scrollable' : 'horizontal layout';
+    },
+
+    _computeSelectionBarClass: function(noBar, alignBottom) {
+      if (noBar) {
+        return 'hidden';
+      } else if (alignBottom) {
+        return 'align-bottom';
+      }
+    },
+
+    // TODO(cdata): Add `track` response back in when gesture lands.
+
+    _onResize: function() {
+      this.debounce('_onResize', function() {
+        this._scroll();
+        this._tabChanged(this.selectedItem);
+      }, 10);
+    },
+
+    _onIronSelect: function(event) {
+      this._tabChanged(event.detail.item, this._previousTab);
+      this._previousTab = event.detail.item;
+      this.cancelDebouncer('tab-changed');
+    },
+
+    _onIronDeselect: function(event) {
+      this.debounce('tab-changed', function() {
+        this._tabChanged(null, this._previousTab);
+      // See polymer/polymer#1305
+      }, 1);
+    },
+
+    get _tabContainerScrollSize () {
+      return Math.max(
+        0,
+        this.$.tabsContainer.scrollWidth -
+          this.$.tabsContainer.offsetWidth
+      );
+    },
+
+    _scroll: function() {
+      var scrollLeft;
+
       if (!this.scrollable) {
         return;
       }
-      var tc = this.$.tabsContainer;
-      var l = tc.scrollLeft;
-      this.leftHidden = l === 0;
-      this.rightHidden = l === (tc.scrollWidth - tc.clientWidth);
+
+      scrollLeft = this.$.tabsContainer.scrollLeft;
+
+      this._leftHidden = scrollLeft === 0;
+      this._rightHidden = scrollLeft === this._tabContainerScrollSize;
     },
-    
-    holdLeft: function() {
-      this.holdJob = setInterval(this.scrollToLeft.bind(this), this.holdDelay);
+
+    _onLeftScrollButtonDown: function() {
+      this._holdJob = setInterval(this._scrollToLeft.bind(this), this._holdDelay);
     },
-    
-    holdRight: function() {
-      this.holdJob = setInterval(this.scrollToRight.bind(this), this.holdDelay);
+
+    _onRightScrollButtonDown: function() {
+      this._holdJob = setInterval(this._scrollToRight.bind(this), this._holdDelay);
     },
-    
-    releaseHold: function() {
-      clearInterval(this.holdJob);
-      this.holdJob = null;
+
+    _onScrollButtonUp: function() {
+      clearInterval(this._holdJob);
+      this._holdJob = null;
     },
-    
-    scrollToLeft: function() {
-      this.$.tabsContainer.scrollLeft -= this.step;
+
+    _scrollToLeft: function() {
+      this.$.tabsContainer.scrollLeft -= this._step;
     },
-    
-    scrollToRight: function() {
-      this.$.tabsContainer.scrollLeft += this.step;
+
+    _scrollToRight: function() {
+      this.$.tabsContainer.scrollLeft += this._step;
     },
-    
-    /**
-     * Invoke this to update the size and position of the bottom bar.  Usually
-     * you only need to call this if the `paper-tabs` is initially hidden and
-     * later becomes visible.
-     *
-     * @method updateBar
-     */
-    updateBar: function() {
-      this.async('selectedItemChanged');
-    },
-    
-    selectedItemChanged: function(old) {
-      var oldIndex = this.selectedIndex;
-      this.super(arguments);
-      var s = this.$.selectionBar.style;
-      
-      if (!this.selectedItem) {
-        s.width = 0;
-        s.left = 0;
+
+    _tabChanged: function(tab, old) {
+      if (!tab) {
+        this._positionBar(0, 0);
         return;
-      } 
-      
+      }
+
       var r = this.$.tabsContent.getBoundingClientRect();
-      this._w = r.width;
-      this._l = r.left;
-      
-      r = this.selectedItem.getBoundingClientRect();
-      this._sw = r.width;
-      this._sl = r.left;
-      this._sOffsetLeft = this._sl - this._l; 
-      
-      if (this.noslide || old == null) {
-        this.positionBarForSelected();
+      var w = r.width;
+      var tabRect = tab.getBoundingClientRect();
+      var tabOffsetLeft = tabRect.left - r.left;
+
+      this._pos = {
+        width: this._calcPercent(tabRect.width, w),
+        left: this._calcPercent(tabOffsetLeft, w)
+      };
+
+      if (this.noSlide || old == null) {
+        // position bar directly without animation
+        this._positionBar(this._pos.width, this._pos.left);
         return;
       }
-      
+
       var oldRect = old.getBoundingClientRect();
-      
+      var oldIndex = this.items.indexOf(old);
+      var index = this.items.indexOf(tab);
       var m = 5;
+
+      // bar animation: expand
       this.$.selectionBar.classList.add('expand');
-      if (oldIndex < this.selectedIndex) {
-        s.width = this.calcPercent(this._sl + this._sw - oldRect.left) - m + '%';
-        this._transitionCounter = 1;
+
+      if (oldIndex < index) {
+        this._positionBar(this._calcPercent(tabRect.left + tabRect.width - oldRect.left, w) - m,
+            this._left);
       } else {
-        s.width = this.calcPercent(oldRect.left + oldRect.width - this._sl) - m + '%';
-        s.left = this.calcPercent(this._sOffsetLeft) + m + '%';
-        this._transitionCounter = 2;
+        this._positionBar(this._calcPercent(oldRect.left + oldRect.width - tabRect.left, w) - m,
+            this._calcPercent(tabOffsetLeft, w) + m);
       }
+
       if (this.scrollable) {
-        this.scrollToSelectedIfNeeded();
+        this._scrollToSelectedIfNeeded(tabRect.width, tabOffsetLeft);
       }
     },
-    
-    scrollToSelectedIfNeeded: function() {
-      var scrollLeft = this.$.tabsContainer.scrollLeft;
-      // scroll to selected if needed
-      if (this._sOffsetLeft + this._sw < scrollLeft || 
-          this._sOffsetLeft - scrollLeft > this.$.tabsContainer.offsetWidth) {
-        this.$.tabsContainer.scrollLeft = this._sOffsetLeft;
+
+    _scrollToSelectedIfNeeded: function(tabWidth, tabOffsetLeft) {
+      var l = tabOffsetLeft - this.$.tabsContainer.scrollLeft;
+      if (l < 0) {
+        this.$.tabsContainer.scrollLeft += l;
+      } else {
+        l += (tabWidth - this.$.tabsContainer.offsetWidth);
+        if (l > 0) {
+          this.$.tabsContainer.scrollLeft += l;
+        }
       }
     },
-    
-    positionBarForSelected: function() {
-      var s = this.$.selectionBar.style;
-      s.width = this.calcPercent(this._sw) + '%';
-      s.left = this.calcPercent(this._sOffsetLeft) + '%';
+
+    _calcPercent: function(w, w0) {
+      return 100 * w / w0;
     },
-    
-    calcPercent: function(w) {
-      return 100 * w / this._w;
+
+    _positionBar: function(width, left) {
+      this._width = width;
+      this._left = left;
+      this.transform(
+          'translate3d(' + left + '%, 0, 0) scaleX(' + (width / 100) + ')',
+          this.$.selectionBar);
     },
-    
-    barTransitionEnd: function(e) {
-      this._transitionCounter--;
+
+    _onBarTransitionEnd: function(e) {
       var cl = this.$.selectionBar.classList;
-      if (cl.contains('expand') && !this._transitionCounter) {
+      // bar animation: expand -> contract
+      if (cl.contains('expand')) {
         cl.remove('expand');
         cl.add('contract');
-        this.positionBarForSelected();
+        this._positionBar(this._pos.width, this._pos.left);
+      // bar animation done
       } else if (cl.contains('contract')) {
         cl.remove('contract');
       }
     }
-    
+
   });
-  
+
 </script>
-</polymer-element>

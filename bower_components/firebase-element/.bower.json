@@ -1,0 +1,33 @@
+{
+  "name": "firebase-element",
+  "version": "1.0.1",
+  "private": true,
+  "main": [
+    "firebase-collection.html",
+    "firebase-document.html",
+    "firebase-auth.html",
+    "firebase-query-behavior.html"
+  ],
+  "dependencies": {
+    "polymer": "polymer/polymer#^1.0.0",
+    "firebase": "^2.2.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "polymerelements/iron-component-page#1.0.2",
+    "promise-polyfill": "polymerlabs/promise-polyfill#^1.0.0",
+    "test-fixture": "polymerelements/test-fixture#^1.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
+    "paper-styles": "polymerelements/paper-styles#^1.0.0",
+    "web-component-tester": "*"
+  },
+  "homepage": "https://github.com/GoogleWebComponents/firebase-element",
+  "_release": "1.0.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.0.1",
+    "commit": "46ec824cff5f62fbd8768c62f936f66c2c7f047e"
+  },
+  "_source": "git://github.com/GoogleWebComponents/firebase-element.git",
+  "_target": "^1.0.0",
+  "_originalSource": "GoogleWebComponents/firebase-element"
+}

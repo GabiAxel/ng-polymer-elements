@@ -1,21 +1,38 @@
 {
   "name": "paper-toast",
+  "version": "1.0.0",
+  "description": "A material design notification toast",
   "private": true,
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "authors": [
+    "The Polymer Authors"
+  ],
+  "keywords": [
+    "web-components",
+    "polymer",
+    "toast",
+    "notification"
+  ],
+  "main": "paper-toast.html",
   "dependencies": {
-    "core-media-query": "Polymer/core-media-query#^0.5.0",
-    "core-overlay": "Polymer/core-overlay#^0.5.0",
-    "font-roboto": "Polymer/font-roboto#^0.5.0",
-    "paper-button": "Polymer/paper-button#^0.5.0"
+    "paper-styles": "PolymerElements/paper-styles#^1.0.0",
+    "polymer": "Polymer/polymer#^1.0.0",
+    "iron-a11y-announcer": "polymerelements/iron-a11y-announcer#^1.0.0"
   },
-  "version": "0.5.1",
-  "homepage": "https://github.com/Polymer/paper-toast",
-  "_release": "0.5.1",
+  "devDependencies": {
+    "iron-component-page": "polymerelements/iron-component-page#^1.0.0",
+    "paper-button": "polymerelements/paper-button#^1.0.0",
+    "web-component-tester": "*",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "homepage": "https://github.com/PolymerElements/paper-toast",
+  "_release": "1.0.0",
   "_resolution": {
     "type": "version",
-    "tag": "0.5.1",
-    "commit": "ed7ba7da215140c6e8dae805b87368ae8eb123c2"
+    "tag": "v1.0.0",
+    "commit": "71e6c327f7aafe9c71010c83d4c4571f63990072"
   },
-  "_source": "git://github.com/Polymer/paper-toast.git",
-  "_target": "^0.5.0",
-  "_originalSource": "Polymer/paper-toast"
+  "_source": "git://github.com/PolymerElements/paper-toast.git",
+  "_target": "^1.0.0",
+  "_originalSource": "PolymerElements/paper-toast"
 }

@@ -1,0 +1,221 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+<head>
+  <title>firebase-document</title>
+
+  <script src="../../webcomponentsjs/webcomponents.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../test-fixture/test-fixture-mocha.js"></script>
+
+  <link rel="import" href="../../polymer/polymer.html">
+  <link rel="import" href="../../promise-polyfill/promise-polyfill.html">
+  <link rel="import" href="../../test-fixture/test-fixture.html">
+  <link rel="import" href="test-helpers.html">
+  <link rel="import" href="../firebase-document.html">
+</head>
+<body>
+  <test-fixture id="TrivialDocument">
+    <template>
+      <firebase-document
+        location="https://fb-element-demo.firebaseio.com/test/trivial"
+        log>
+      </firebase-document>
+    </template>
+  </test-fixture>
+  <test-fixture id="UpdateableDocument">
+    <template>
+      <firebase-document
+        location="https://fb-element-demo.firebaseio.com/test/updateable_document"
+        log>
+      </firebase-document>
+    </template>
+  </test-fixture>
+  <test-fixture id="MalleableDocument">
+    <template>
+      <firebase-document
+        id="local"
+        location="https://fb-element-demo.firebaseio.com/test/document"
+        log>
+      </firebase-document>
+      <firebase-document
+        id="remote"
+        location="https://fb-element-demo.firebaseio.com/test/document"
+        log>
+      </firebase-document>
+    </template>
+  </test-fixture>
+  <script>
+
+    suite('<firebase-document>', function() {
+      var firebase;
+
+      suite('basic usage', function() {
+        setup(function() {
+          firebase = fixture('TrivialDocument');
+        });
+
+        teardown(function() {
+          firebase.disconnect();
+        });
+
+        test('receives data from Firebase location', function(done) {
+          waitForEvent(firebase, 'data-changed').then(function() {
+            expect(firebase.data.passed).to.be.equal(true);
+            done();
+          }).catch(function() {
+            done(e);
+          });
+        });
+      });
+
+      suite('document updating', function() {
+        setup(function(done) {
+          firebase = fixture('UpdateableDocument');
+          waitForEvent(firebase, 'firebase-value').then(function() {
+            done();
+          });
+        });
+
+        test('setting data property updates the document', function(done) {
+          var data = {};
+          var newValue = Math.random().toString().split('.').pop();
+
+          data[newValue] = newValue;
+
+          waitForEvent(firebase, 'firebase-value').then(function() {
+            expect(firebase.data[newValue]).to.be.eql(newValue);
+            done();
+          }).catch(function(e) {
+            done(e);
+          }).then(function() {
+            firebase.set('data.' + newValue, null);
+          });
+
+          firebase.set('data', data);
+        });
+      });
+
+      suite('document manipulation', function() {
+        var localFirebase;
+        var remoteFirebase;
+        var key;
+
+        setup(function(done) {
+          firebase = fixture('MalleableDocument');
+          key = randomKey();
+
+          localFirebase = firebase[0];
+          remoteFirebase = firebase[1];
+
+          Promise.all([
+            localFirebase.data ? null : waitForEvent(localFirebase, 'data-changed'),
+            remoteFirebase.data ? null : waitForEvent(remoteFirebase, 'data-changed')
+          ]).then(function() {
+            done();
+          });
+        });
+
+        teardown(function(done) {
+          new Promise(function(resolve, reject) {
+            if (localFirebase.data[key] == null) {
+              resolve();
+            } else {
+              resolve(waitForEvent(localFirebase, 'firebase-value'));
+              localFirebase.set('data.' + key, null);
+            }
+          }).then(function() {
+            localFirebase.disconnect();
+            remoteFirebase.disconnect();
+            done();
+          }).catch(function(e) {
+            done(e);
+          });
+        });
+
+        test('all clients reflect same document', function() {
+          expect(localFirebase.data.permanentValue).to.be.okay;
+          expect(localFirebase.data).to.be.eql(remoteFirebase.data);
+        });
+
+        test('local data-bound child-add reflects remotely', function(done) {
+
+          waitForEvent(remoteFirebase, 'firebase-child-added').then(function() {
+            expect(remoteFirebase.data[key]).to.be.equal(
+              localFirebase.data[key]
+            );
+          }).then(function() {
+            done();
+          }).catch(function(e) {
+            done(e);
+          });
+
+          localFirebase.set('data.' + key, 'foo');
+        });
+
+        test('local data-bound child-remove reflects remotely', function(done) {
+
+          waitForEvent(remoteFirebase, 'firebase-child-added').then(function() {
+            var dataIsRemoved = waitForEvent(remoteFirebase, 'firebase-child-removed');
+            localFirebase.set('data.' + key, null);
+            return dataIsRemoved;
+          }).then(function() {
+            expect(localFirebase.data[key]).to.not.be.okay;
+            expect(remoteFirebase.data[key]).to.not.be.okay;
+            done();
+          }).catch(function(e) {
+            done(e);
+          });
+
+          localFirebase.set('data.' + key, 'foo');
+        });
+
+        test('child sub-tree modifications reflect remotely', function(done) {
+
+          waitForEvent(remoteFirebase, 'firebase-child-added').then(function() {
+            expect(localFirebase.data[key].foo).to.be.equal(1);
+            expect(remoteFirebase.data[key]).to.be.eql(localFirebase.data[key]);
+
+            var subtreeKeyIsAdded = waitForEvent(remoteFirebase, 'firebase-child-changed');
+            localFirebase.set('data.' + key + '.bar', 2);
+            return subtreeKeyIsAdded;
+          }).then(function() {
+            expect(localFirebase.data[key].bar).to.be.equal(2);
+            expect(remoteFirebase.data[key]).to.be.eql(localFirebase.data[key]);
+
+            expect(localFirebase.data[key].foo).to.be.okay;
+            expect(remoteFirebase.data[key].foo).to.be.okay;
+
+            var subtreeKeyIsRemoved = waitForEvent(remoteFirebase, 'firebase-child-changed');
+            localFirebase.set('data.' + key + '.foo', null);
+            return subtreeKeyIsRemoved;
+          }).then(function() {
+            expect(localFirebase.data[key].foo).to.not.be.okay;
+            expect(remoteFirebase.data[key].foo).to.not.be.okay;
+
+            expect(localFirebase.data[key].bar).to.be.okay;
+            expect(remoteFirebase.data[key].bar).to.be.okay;
+
+            done();
+          }).catch(function(e) {
+            done(e);
+          });
+
+          localFirebase.set('data.' + key, {
+            foo: 1
+          });
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

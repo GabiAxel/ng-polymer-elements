@@ -1,0 +1,48 @@
+{
+  "name": "google-map",
+  "version": "1.0.3",
+  "description": "Google Maps web components",
+  "homepage": "https://googlewebcomponents.github.io/google-map",
+  "main": [
+    "google-map.html",
+    "google-map-search.html",
+    "google-map-marker.html",
+    "google-map-directions.html"
+  ],
+  "authors": [
+    "Frankie Fu <ffu@google.com>",
+    "Scott Miles <sjmiles@google.com>",
+    "Eric Bidelman <ebidel@gmail.com>"
+  ],
+  "license": "Apache-2",
+  "ignore": [
+    "/.*",
+    "/test/"
+  ],
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "google",
+    "apis",
+    "maps"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "google-apis": "GoogleWebComponents/google-apis#^1.0.0",
+    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.0"
+  },
+  "devDependencies": {
+    "web-component-tester": "*",
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.2"
+  },
+  "_release": "1.0.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.0.3",
+    "commit": "18dc165f57be98dd15636da96df226ccf475e3c4"
+  },
+  "_source": "git://github.com/GoogleWebComponents/google-map.git",
+  "_target": "^1.0.0",
+  "_originalSource": "GoogleWebComponents/google-map"
+}

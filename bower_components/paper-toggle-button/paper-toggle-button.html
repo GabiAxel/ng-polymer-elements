@@ -1,5 +1,6 @@
 <!--
-Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
@@ -7,148 +8,165 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../paper-behaviors/paper-inky-focus-behavior.html">
+
 <!--
 `paper-toggle-button` provides a ON/OFF switch that user can toggle the state
-by tapping or by dragging the swtich.
+by tapping or by dragging the switch.
 
 Example:
 
     <paper-toggle-button></paper-toggle-button>
 
-Styling toggle button:
+### Styling
 
-To change the ink color for checked state:
+The following custom properties and mixins are available for styling:
 
-    paper-toggle-button::shadow paper-radio-button::shadow #ink[checked] {
-      color: #4285f4;
-    }
-    
-To change the radio checked color:
-    
-    paper-toggle-button::shadow paper-radio-button::shadow #onRadio {
-      background-color: #4285f4;
-    }
-    
-To change the bar color for checked state:
-
-    paper-toggle-button::shadow #toggleBar[checked] {
-      background-color: #4285f4;
-    }
-    
-To change the ink color for unchecked state:
-
-    paper-toggle-button::shadow paper-radio-button::shadow #ink {
-      color: #b5b5b5;
-    }
-    
-To change the radio unchecked color:
-    
-    paper-toggle-button::shadow paper-radio-button::shadow #offRadio {
-      border-color: #b5b5b5;
-    }
-
-To change the bar color for unchecked state:
-
-    paper-toggle-button::shadow #toggleBar {
-      background-color: red;
-    }
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-toggle-button-unchecked-bar-color` | Slider color when the input is not checked | `#000000`
+`--paper-toggle-button-unchecked-button-color` | Button color when the input is not checked | `--paper-grey-50`
+`--paper-toggle-button-unchecked-ink-color` | Selected/focus ripple color when the input is not checked | `--dark-primary-color`
+`--paper-toggle-button-checked-bar-color` | Slider button color when the input is checked | `--google-green-500`
+`--paper-toggle-button-checked-button-color` | Button color when the input is checked | `--google-green-500`
+`--paper-toggle-button-checked-ink-color` | Selected/focus ripple color when the input is checked | `--google-green-500`
 
 @group Paper Elements
 @element paper-toggle-button
-@homepage github.io
+@hero hero.svg
+@demo demo/index.html
 -->
 
-<link rel="import" href="../paper-radio-button/paper-radio-button.html">
+<dom-module id="paper-toggle-button">
 
-<polymer-element name="paper-toggle-button" attributes="checked disabled" role="button" aria-pressed="false" tabindex="0">
-<template>
+  <link rel="import" type="css" href="paper-toggle-button.css">
 
-  <link rel="stylesheet" href="paper-toggle-button.css">
+  <template>
 
-  <div id="toggleContainer" disabled?="{{disabled}}">
-  
-    <div id="toggleBar" checked?="{{checked}}"></div>
-  
-    <paper-radio-button id="toggleRadio" toggles checked="{{checked}}" on-change="{{changeAction}}" on-core-change="{{stopPropagation}}"
-        on-trackstart="{{trackStart}}" on-trackx="{{trackx}}" on-trackend="{{trackEnd}}"></paper-radio-button>
-    
-  </div>
+    <div id="toggleContainer">
+      <div id="toggleBar" class="toggle-bar"></div>
+      <div id="toggleButton" class="toggle-button">
+        <paper-ripple id="ink" class="toggle-ink circle" recenters></paper-ripple>
+      </div>
+    </div>
 
-</template>
-<script>
+  </template>
 
-  Polymer('paper-toggle-button', {
-    
-    /**
-     * Fired when the checked state changes due to user interaction.
-     *
-     * @event change
-     */
-     
-    /**
-     * Fired when the checked state changes.
-     *
-     * @event core-change
-     */
+  <script>
+    Polymer({
+      is: 'paper-toggle-button',
 
-    /**
-     * Gets or sets the state, `true` is checked and `false` is unchecked.
-     *
-     * @attribute checked
-     * @type boolean
-     * @default false
-     */
-    checked: false,
-    
-    /**
-     * If true, the toggle button is disabled.  A disabled toggle button cannot
-     * be tapped or dragged to change the checked state.
-     *
-     * @attribute disabled
-     * @type boolean
-     * @default false
-     */
-    disabled: false,
+      behaviors: [
+        Polymer.PaperInkyFocusBehavior
+      ],
 
-    trackStart: function(e) {
-      this._w = this.$.toggleBar.offsetLeft + this.$.toggleBar.offsetWidth;
-      e.preventTap();
-    },
+      hostAttributes: {
+        role: 'button',
+        'aria-pressed': 'false',
+        tabindex: 0
+      },
 
-    trackx: function(e) {
-      this._x = Math.min(this._w, 
-          Math.max(0, this.checked ? this._w + e.dx : e.dx));
-      this.$.toggleRadio.classList.add('dragging');
-      var s =  this.$.toggleRadio.style;
-      s.webkitTransform = s.transform = 'translate3d(' + this._x + 'px,0,0)';
-    },
+      properties: {
+        /**
+         * Fired when the checked state changes due to user interaction.
+         *
+         * @event change
+         */
+        /**
+         * Fired when the checked state changes.
+         *
+         * @event iron-change
+         */
+        /**
+         * Gets or sets the state, `true` is checked and `false` is unchecked.
+         *
+         * @attribute checked
+         * @type boolean
+         * @default false
+         */
+        checked: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          notify: true,
+          observer: '_checkedChanged'
+        },
 
-    trackEnd: function() {
-      var s =  this.$.toggleRadio.style;
-      s.transform = s.webkitTransform = '';
-      this.$.toggleRadio.classList.remove('dragging');
-      var old = this.checked;
-      this.checked = Math.abs(this._x) > this._w / 2;
-      if (this.checked !== old) {
-        this.fire('change');
+        /**
+         * If true, the button toggles the active state with each tap or press
+         * of the spacebar.
+         *
+         * @attribute toggles
+         * @type boolean
+         * @default true
+         */
+        toggles: {
+          type: Boolean,
+          value: true,
+          reflectToAttribute: true
+        }
+      },
+
+      listeners: {
+        track: '_ontrack'
+      },
+
+      ready: function() {
+        this._isReady = true;
+      },
+
+      // button-behavior hook
+      _buttonStateChanged: function() {
+        if (this.disabled) {
+          return;
+        }
+        if (this._isReady) {
+          this.checked = this.active;
+        }
+      },
+
+      _checkedChanged: function(checked) {
+        this.active = this.checked;
+        this.fire('iron-change');
+      },
+
+      _ontrack: function(event) {
+        var track = event.detail;
+        if (track.state === 'start') {
+          this._trackStart(track);
+        } else if (track.state === 'track') {
+          this._trackMove(track);
+        } else if (track.state === 'end') {
+          this._trackEnd(track);
+        }
+      },
+
+      _trackStart: function(track) {
+        this._width = this.$.toggleBar.offsetWidth / 2;
+        /*
+         * keep an track-only check state to keep the dragging behavior smooth
+         * while toggling activations
+         */
+        this._trackChecked = this.checked;
+        this.$.toggleButton.classList.add('dragging');
+      },
+
+      _trackMove: function(track) {
+        var dx = track.dx;
+        this._x = Math.min(this._width,
+            Math.max(0, this._trackChecked ? this._width + dx : dx));
+        this.translate3d(this._x + 'px', 0, 0, this.$.toggleButton);
+        this._userActivate(this._x > (this._width / 2));
+      },
+
+      _trackEnd: function(track) {
+        this.$.toggleButton.classList.remove('dragging');
+        this.transform('', this.$.toggleButton);
       }
-    },
-    
-    checkedChanged: function() {
-      this.setAttribute('aria-pressed', Boolean(this.checked));
-      this.fire('core-change');
-    },
-    
-    changeAction: function(e) {
-      e.stopPropagation();
-      this.fire('change');
-    },
-    
-    stopPropagation: function(e) {
-      e.stopPropagation();
-    }
 
-  });
+    });
+  </script>
 
-</script>
-</polymer-element>
+</dom-module>

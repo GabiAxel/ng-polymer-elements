@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <style>
+    #drop_zone {
+      border: 2px dashed #bbb;
+      -moz-border-radius: 5px;
+      -webkit-border-radius: 5px;
+      border-radius: 5px;
+      padding: 25px;
+      text-align: center;
+      font: 20pt bold 'Helvetica';
+      color: #bbb;
+    }
+    </style>
+  </head>
+  <body>
+      <span id="signin">
+        <span
+          class="g-signin"
+          data-callback="signinCallback"
+          data-clientid="692008307570.apps.googleusercontent.com"
+          data-cookiepolicy="single_host_origin"
+          data-scope="https://www.googleapis.com/auth/drive.file">
+        </span>
+      </span>
+
+      <div id="drop_zone" style="display:none;">Drop files here</div>
+     
+     <div id="results"/>
+     <script src="upload.js"></script>
+     <script type="text/javascript">
+     
+       var accessToken = null;
+       
+       /**
+        * Callback for G+ Sign-in. Swaps views if login successful.
+        */
+       function signinCallback(result) {
+           if(result.access_token) {
+               accessToken = result.access_token;
+               document.getElementById('signin').style.display = 'none';
+               document.getElementById('drop_zone').style.display = null;
+           }
+       }
+ 
+       /**
+        * Called when files are dropped on to the drop target. For each file,
+        * uploads the content to Drive & displays the results when complete.
+        */
+       function handleFileSelect(evt) {
+         evt.stopPropagation();
+         evt.preventDefault();
+
+         var files = evt.dataTransfer.files; // FileList object.
+         
+         var output = [];
+         for (var i = 0, f; f = files[i]; i++) {
+             var uploader = new MediaUploader({
+                 file: f,
+                 token: accessToken,
+                 onComplete: function(data) {
+                     var element = document.createElement("pre");
+                     element.appendChild(document.createTextNode(data));
+                     document.getElementById('results').appendChild(element);
+                 }
+             });
+             uploader.upload();
+         }
+       }
+
+       /**
+        * Dragover handler to set the drop effect.
+        */
+       function handleDragOver(evt) {
+         evt.stopPropagation();
+         evt.preventDefault();
+         evt.dataTransfer.dropEffect = 'copy'; 
+       }
+
+       /**
+        * Wire up drag & drop listeners once page loads
+        */
+       document.addEventListener('DOMContentLoaded', function () {
+           var dropZone = document.getElementById('drop_zone');
+           dropZone.addEventListener('dragover', handleDragOver, false);
+           dropZone.addEventListener('drop', handleFileSelect, false);
+       });
+
+     </script>
+     <script src="https://apis.google.com/js/client:plusone.js"></script>
+  </body>
+</html>

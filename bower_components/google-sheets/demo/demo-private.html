@@ -1,0 +1,121 @@
+<!doctype html>
+<!-- Copyright (c) 2014 Google Inc. All rights reserved. -->
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>google-sheets private data demo</title>
+  <script src="../webcomponentsjs/webcomponents.min.js"></script>
+  <link rel="import" href="google-sheets.html">
+  <link rel="import" href="../google-map/google-map.html">
+  <link rel="import" href="../google-signin/google-signin.html">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 2em;
+      font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial;
+      font-weight: 300;
+      background-color: #f1f1f3;
+    }
+    a {
+      text-decoration: none;
+      color: blue;
+    }
+    ul {
+      padding-left: 0;
+    }
+    ul, li {
+      list-style: none;
+      font-size: 14px;
+    }
+    section {
+      border-radius: 3px;
+      box-shadow: 1px 1px 3px #ccc;
+      padding: 1em 2em;
+      background-color: white;
+      width: 500px;
+      min-height: 500px;
+    }
+    main {
+      justify-content: space-around;
+      margin-top: 2em;
+    }
+  </style>
+</head>
+<body unresolved>
+
+<google-signin
+  client-id="1054047045356-j8pgqgls9vdef3rl09hapoicumbte0bo.apps.googleusercontent.com"
+  scopes="https://spreadsheets.google.com/feeds">
+</google-signin>
+
+<p>A <code>&lt;google-sheets></code> element returning data from a <b>private</b> Google Spreadsheet:</p>
+
+<!-- Example: private spreadsheet -->
+<google-sheets id="sheet" tabid="1"
+       client-id="750497606405-1hq66meqmr4dp09dn54j9ggv85vbv0gp.apps.googleusercontent.com"
+       key="1QMGizivw3UJ3-R9BFK7sfrXE0RL87dygk2C0RcuKoDY"></google-sheets>
+
+<main layout horizontal>
+
+<section>
+
+  <heading>
+    <h3>List of spreadsheets</h3>
+  </heading>
+
+  <template id="spreadsheets" is="auto-binding">
+    <ul>
+      <template repeat="{{spreadsheets}}">
+        <li>{{title.$t}}</li>
+      </template>
+    </ul>
+  </template>
+
+</section>
+
+<section>
+
+  <template id="rows" bind>
+    <heading>
+      <h3>Spreadsheet rows:
+        <a href="{{openInGoogleDocsURL}}" target="_blank" title="Open in Google Docs &rarr;">
+          "{{tab.title}}" tab
+        </a>
+      </h3>
+      <h5>updated: {{tab.updated}}, by: <template repeat="{{rows.authors}}">{{name}} </template></h5>
+    </heading>
+    <ul>
+      <template repeat="{{rows}}">
+        <li>Name: {{gsx$name.$t}} ( lat: {{gsx$lat.$t}}, lng: {{gsx$lng.$t}} )</li>
+      </template>
+    </ul>
+  </template>
+
+</section>
+
+</main>
+
+<script>
+var sheet = document.querySelector('#sheet');
+
+sheet.addEventListener('google-sheet-data', function(e) {
+  switch (e.detail.type) {
+    case 'spreadsheets':
+      document.querySelector('#spreadsheets').spreadsheets = this.spreadsheets;
+      break;
+    case 'rows':
+      document.querySelector('#rows').model = this;
+      break;
+    default:
+      break;
+  }
+});
+
+sheet.addEventListener('core-error', function(e) {
+  alert(e.detail.response);
+});
+</script>
+</body>
+</html>

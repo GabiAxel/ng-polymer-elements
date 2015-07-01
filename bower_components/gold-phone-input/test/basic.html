@@ -1,0 +1,117 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+<head>
+
+  <title>gold-phone-input tests</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../test-fixture/test-fixture-mocha.js"></script>
+
+  <script src="../../iron-test-helpers/test-helpers.js"></script>
+
+  <link rel="import" href="../../test-fixture/test-fixture.html">
+  <link rel="import" href="../gold-phone-input.html">
+
+</head>
+<body>
+
+  <test-fixture id="basic">
+    <template>
+      <gold-phone-input></gold-phone-input>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="required">
+    <template>
+      <gold-phone-input auto-validate required error-message="error"></gold-phone-input>
+    </template>
+  </test-fixture>
+
+  <script>
+
+    suite('basic', function() {
+      test('input is spaced out correctly', function() {
+        var input = fixture('basic');
+        input.value='1231112222';
+        assert.equal(input.value, '123-111-2222');
+      });
+
+      test('invalid input is not ok', function() {
+        var input = fixture('required');
+        input.value='1234';
+        forceXIfStamp(input);
+
+        var container = Polymer.dom(input.root).querySelector('paper-input-container');
+        assert.ok(container, 'paper-input-container exists');
+        assert.isTrue(container.invalid);
+      });
+
+      test('valid input is ok', function() {
+        var input = fixture('required');
+        input.value='1231112222';
+        forceXIfStamp(input);
+
+        var container = Polymer.dom(input.root).querySelector('paper-input-container');
+        assert.ok(container, 'paper-input-container exists');
+        assert.isFalse(container.invalid);
+      });
+
+      test('empty required input shows error', function() {
+        var input = fixture('required');
+        forceXIfStamp(input);
+
+        var error = Polymer.dom(input.root).querySelector('paper-input-error');
+        assert.ok(error, 'paper-input-error exists');
+        assert.notEqual(getComputedStyle(error).display, 'none', 'error is not display:none');
+      });
+
+      test('caret position is preserved', function() {
+        var input = fixture('required');
+        var ironInput = Polymer.dom(input.root).querySelector('input[is="iron-input"]');
+        input.value='111-111-1';
+        ironInput.selectionStart = 2;
+        ironInput.selectionEnd = 2;
+        input._computeValue('112-111-11');
+
+        assert.equal(ironInput.selectionStart, 2, 'selectionStart is preserved');
+        assert.equal(ironInput.selectionEnd, 2, 'selectionEnd is preserved');
+      });
+
+      suite('a11y', function() {
+
+        test('has aria-labelledby', function() {
+          var input = fixture('basic');
+          assert.isTrue(input.inputElement.hasAttribute('aria-labelledby'))
+          assert.equal(input.inputElement.getAttribute('aria-labelledby'), Polymer.dom(input.root).querySelector('label').id, 'aria-labelledby points to the label');
+        });
+
+        test('required and error has aria-labelledby', function() {
+          var input = fixture('required');
+          assert.isTrue(input.inputElement.hasAttribute('aria-labelledby'))
+          assert.equal(input.inputElement.getAttribute('aria-labelledby'), Polymer.dom(input.root).querySelector('label').id, 'aria-labelledby points to the label');
+        });
+
+      });
+
+
+    });
+
+  </script>
+
+</body>
+</html>

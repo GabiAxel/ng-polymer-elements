@@ -1,0 +1,209 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-input/paper-input-behavior.html">
+<link rel="import" href="../paper-input/paper-input-container.html">
+<link rel="import" href="../paper-input/paper-input-error.html">
+<link rel="import" href="../iron-input/iron-input.html">
+<link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html">
+
+<!--
+`<gold-phone-input>` is a single-line text field with Material Design styling
+for entering a phone number.
+
+    <gold-phone-input></gold-phone-input>
+
+It may include an optional label, which by default is "Phone number".
+
+    <gold-phone-input label="call this"></gold-phone-input>
+
+### Validation
+
+By default, the phone number is considered to be a US phone number, and
+will be validated according to the pattern `XXX-XXX-XXXX`, where `X` is a
+digit, and `-` is the separating dash. If you want to customize the input
+for a different area code or number pattern, use the `country-code` and
+`phone-number-pattern` attributes
+
+    <gold-phone-input
+        country-code="33"
+        phone-number-pattern="X-XX-XX-XX-XX">
+    </gold-phone-input>
+
+The input can be automatically validated as the user is typing by using
+the `auto-validate` and `required` attributes. For manual validation, the
+element also has a `validate()` method, which returns the validity of the
+input as well sets any appropriate error messages and styles.
+
+See `Polymer.PaperInputBehavior` for more API docs.
+
+### Styling
+
+See `Polymer.PaperInputContainer` for a list of custom properties used to
+style this element.
+
+@group Gold Elements
+@hero hero.svg
+@demo demo/index.html
+@class gold-phone-input
+-->
+
+<dom-module id="gold-phone-input">
+  <style>
+  :host {
+    display: block;
+  }
+
+  /* TODO: This should be a dropdown */
+  span {
+    @apply(--paper-font-subhead);
+    @apply(--paper-input-container-input);
+    width: 40px;
+  }
+
+  </style>
+
+  <template>
+    <paper-input-container id="container" auto-validate="[[autoValidate]]"
+        disabled$="[[disabled]]"
+        no-label-float="[[noLabelFloat]]"
+        always-float-label="[[_computeAlwaysFloatLabel(alwaysFloatLabel,placeholder)]]"
+        invalid="[[invalid]]">
+
+      <label style="left:40px;" hidden$="[[!label]]">[[label]]</label>
+
+      <div class="horizontal layout">
+        <span>+<span>[[countryCode]]</span></span>
+
+        <input is="iron-input" id="input" class="flex"
+          aria-labelledby$="[[_ariaLabelledBy]]"
+          aria-describedby$="[[_ariaDescribedBy]]"
+          required$="[[required]]"
+          bind-value="{{value}}"
+          name$="[[name]]"
+          allowed-pattern="[0-9\-]"
+          autocomplete="tel"
+          type="tel"
+          prevent-invalid-input
+          disabled$="[[disabled]]"
+          invalid="{{invalid}}"
+          autofocus$="[[autofocus]]"
+          inputmode$="[[inputmode]]"
+          placeholder$="[[placeholder]]"
+          readonly$="[[readonly]]"
+          size$="[[size]]">
+      </div>
+
+      <template is="dom-if" if="[[errorMessage]]">
+        <paper-input-error id="error">[[errorMessage]]</paper-input-error>
+      </template>
+
+    </paper-input-container>
+  </template>
+
+</dom-module>
+
+<script>
+(function() {
+  Polymer({
+
+    is: 'gold-phone-input',
+
+    behaviors: [
+      Polymer.PaperInputBehavior,
+      Polymer.IronFormElementBehavior
+    ],
+
+    properties: {
+      /**
+       * The label for this input.
+       */
+      label: {
+        type: String,
+        value: 'Phone number'
+      },
+
+      /*
+       * The country code that should be recognized and parsed.
+       */
+      countryCode: {
+        type: String,
+        value: '1'
+      },
+
+      /*
+       * The format of a valid phone number, including formatting but excluding
+       * the country code. Use 'X' to denote the digits separated by dashes.
+       */
+      phoneNumberPattern: {
+        type: String,
+        value: 'XXX-XXX-XXXX',
+        observer: '_phoneNumberPatternChanged'
+      }
+    },
+
+    observers: [
+      '_computeValue(value)'
+    ],
+
+    _phoneNumberPatternChanged: function() {
+      // Transform the pattern into a regex the iron-input understands.
+      var regex = '';
+      regex = this.phoneNumberPattern.replace(/\s/g, '\\s');
+      regex = regex.replace(/X/gi, '\\d');
+      regex = regex.replace(/\+/g, '\\+');
+      this.$.input.pattern = regex;
+
+      if (this.autoValidate) {
+        this.$.container.invalid = !this.$.input.validate();
+      }
+    },
+
+    _computeValue: function(value) {
+      var start = this.$.input.selectionStart;
+      var previousCharADash = this.value.charAt(start - 1) == '-';
+
+      // Remove any already-applied formatting.
+      value = value.replace(/-/g, '');
+      var shouldFormat = value.length <= this.phoneNumberPattern.replace(/-/g, '').length;
+      var formattedValue = '';
+
+      // Fill in the dashes according to the specified pattern.
+      var currentDashIndex = 0;
+      var totalDashesAdded = 0;
+      for (var i = 0; i < value.length; i++) {
+        currentDashIndex = this.phoneNumberPattern.indexOf('-', currentDashIndex);
+
+        // Since we remove any formatting first, we need to account added dashes
+        // when counting the position of new dashes in the pattern.
+        if (shouldFormat && i == (currentDashIndex - totalDashesAdded)) {
+          formattedValue += '-';
+          currentDashIndex++;
+          totalDashesAdded++;
+        }
+
+        formattedValue += value[i];
+      }
+      this.updateValueAndPreserveCaret(formattedValue.trim());
+
+      // If the character right before the selection is a newly inserted
+      // dash, we need to advance the selection to maintain the caret position.
+      if (!previousCharADash && this.value.charAt(start - 1) == '-') {
+        this.$.input.selectionStart = start + 1;
+        this.$.input.selectionEnd = start + 1;
+      }
+    }
+
+  })
+
+})();
+
+</script>

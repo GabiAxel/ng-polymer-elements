@@ -1,11 +1,14 @@
 {
 	"name": "ng-polymer-elements gh-pages",
 	"dependencies": {
-		"ng-polymer-elements": "0.2.0",
-		"core-elements": "Polymer/core-elements#0.5.1",
-		"paper-elements": "Polymer/paper-elements#0.5.1",
+		"ng-polymer-elements": "0.3.0",
+		"iron-elements": "^1.0.0",
+		"paper-elements": "PolymerElements/paper-elements#^1.0.0",
+		"gold-elements": "PolymerElements/gold-elements#^1.0.0",
+		"google-web-components": "^1.0.0",
 		"bootstrap": "3.2.0",
 		"fontawesome": "4.1.0",
-		"google-code-prettify": "1.0.2"
+		"google-code-prettify": "1.0.2",
+		"object.observe": "^0.2.4"
 	}
 }

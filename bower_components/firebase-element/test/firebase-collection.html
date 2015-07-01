@@ -1,0 +1,259 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+<head>
+  <title>firebase-collection</title>
+
+  <script src="../../webcomponentsjs/webcomponents.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../test-fixture/test-fixture-mocha.js"></script>
+
+  <link rel="import" href="../../polymer/polymer.html">
+  <link rel="import" href="../../promise-polyfill/promise-polyfill.html">
+  <link rel="import" href="../../test-fixture/test-fixture.html">
+  <link rel="import" href="test-helpers.html">
+  <link rel="import" href="../firebase-collection.html">
+</head>
+<body>
+  <test-fixture id="TrivialCollection">
+    <template>
+      <firebase-collection
+        location="https://fb-element-demo.firebaseio.com/test/trivial"
+        log>
+      </firebase-collection>
+    </template>
+  </test-fixture>
+  <test-fixture id="PrimitiveCollection">
+    <template>
+      <firebase-collection
+        location="https://fb-element-demo.firebaseio.com/test/primitives"
+        order-by-value
+        log>
+      </firebase-collection>
+    </template>
+  </test-fixture>
+  <test-fixture id="ChangingChildren">
+    <template>
+      <firebase-collection
+        location="https://fb-element-demo.firebaseio.com/test/changing_children"
+        order-by-child="foo"
+        log>
+      </firebase-collection>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="SyncingCollections">
+    <template>
+      <firebase-collection
+        location="https://fb-element-demo.firebaseio.com/test/syncing"
+        log>
+      </firebase-collection>
+      <firebase-collection
+        location="https://fb-element-demo.firebaseio.com/test/syncing"
+        order-by-child="foo"
+        log>
+      </firebase-collection>
+    </template>
+  </test-fixture>
+
+  <script>
+    suite('<firebase-document>', function() {
+      var firebase;
+
+      suite('basic usage', function() {
+        setup(function() {
+          firebase = fixture('TrivialCollection');
+        });
+
+        teardown(function() {
+          firebase.disconnect();
+        });
+
+        test('exposes data as an array', function(done) {
+          waitForEvent(firebase, 'firebase-child-added').then(function() {
+            expect(firebase.data).to.be.an('array');
+            done();
+          }).catch(function(e) {
+            done(e);
+          });
+        });
+
+        test('receives data from Firebase location', function(done) {
+          waitForEvent(firebase, 'data-changed').then(function() {
+            expect(firebase.data[0].value).to.be.equal(true);
+            done();
+          }).catch(function(e) {
+            done(e);
+          });
+        });
+      });
+
+      suite('ordered primitives', function() {
+        setup(function() {
+          firebase = fixture('PrimitiveCollection');
+        });
+
+        teardown(function() {
+          firebase.disconnect();
+        });
+
+        test('converts primitives into objects with a value key', function(done) {
+          waitForEvent(firebase, 'firebase-child-added').then(function() {
+            expect(firebase.data[0]).to.be.an('object');
+            done();
+          }).catch(function(e) {
+            done(e);
+          });
+        });
+
+        test('orders primitives by value', function(done) {
+          waitForEvent(firebase, 'firebase-value').then(function() {
+            var lastValue = -Infinity;
+            expect(firebase.data.length).to.be.greaterThan(0);
+            firebase.data.forEach(function(item) {
+              expect(item.value).to.not.be.lessThan(lastValue);
+              lastValue = item.value;
+            });
+            done();
+          }).catch(function(e) {
+            done(e);
+          });
+        });
+
+        suite('adding a value locally', function() {
+          setup(function(done) {
+            waitForEvent(firebase, 'firebase-value').then(function() {
+              done();
+            }).catch(function(e) {
+              done(e);
+            });
+          });
+
+          test('can be done with `add`', function(done) {
+            var length = firebase.data.length;
+            var newValue = firebase.data[firebase.data.length - 1].value + 1;
+            var key;
+
+            waitForEvent(firebase, 'firebase-child-added').then(function() {
+              expect(firebase.data.length).to.be.equal(length + 1);
+              expect(firebase.data[firebase.data.length - 1].value).to.be.equal(newValue);
+              done();
+            }).catch(function(e) {
+              done(e);
+            }).then(function() {
+              firebase.removeByKey(key);
+            });
+
+            key = firebase.add(newValue).key();
+          });
+        });
+      });
+
+      suite('a child changes', function() {
+        setup(function(done) {
+          firebase = fixture('ChangingChildren');
+          waitForEvent(firebase, 'firebase-value').then(function() {
+            done();
+          }).catch(function(e) {
+            done(e)
+          });
+        });
+
+        test('updates the child key in place with the new value', function(done) {
+          var childrenKeys = [];
+
+          waitForEvent(firebase, 'firebase-value').then(function() {
+            var middleValue = firebase.getByKey(childrenKeys[1]);
+            var changes;
+
+            expect(middleValue.foo).to.be.equal(1);
+            expect(middleValue.bar).to.be.equal(1);
+
+            changes = waitForEvent(firebase, 'firebase-child-changed');
+
+            firebase.set('data.' + firebase.data.indexOf(middleValue) + '.bar', 2);
+
+            return changes;
+          }).then(function() {
+            var middleValue = firebase.getByKey(childrenKeys[1]);
+
+            expect(middleValue.foo).to.be.equal(1);
+            expect(middleValue.bar).to.be.equal(2);
+
+            done();
+          }).catch(function(e) {
+            done(e);
+          }).then(function() {
+            childrenKeys.forEach(function(key) {
+              firebase.removeByKey(key);
+            });
+          });
+
+          childrenKeys = [0, 1, 2].map(function(value, index) {
+            return firebase.add({
+              foo: value,
+              bar: index
+            }).key();
+          });
+        });
+      });
+
+      suite('syncing collections', function() {
+        var localFirebase;
+        var remoteFirebase;
+
+        setup(function(done) {
+          firebase = fixture('SyncingCollections');
+          localFirebase = firebase[0];
+          remoteFirebase = firebase[1];
+          Promise.all([
+            waitForEvent(localFirebase, 'firebase-value'),
+            waitForEvent(remoteFirebase, 'firebase-value')
+          ]).then(function() {
+            done();
+          }).catch(function(e) {
+            done(e);
+          });
+        });
+
+        test('syncs a new item at the correct index', function(done) {
+          var data = {
+            foo: 100
+          };
+          var key;
+
+          waitForEvent(remoteFirebase, 'firebase-value').then(function() {
+            var value = remoteFirebase.getByKey(key);
+            var lowValue = remoteFirebase.getByKey('lowValue');
+            var highValue = remoteFirebase.getByKey('highValue');
+
+            var index = remoteFirebase.data.indexOf(value);
+            var lowIndex = remoteFirebase.data.indexOf(lowValue);
+            var highIndex = remoteFirebase.data.indexOf(highValue);
+
+            expect(value).to.be.okay;
+            expect(index).to.be.lessThan(highIndex);
+            expect(index).to.be.greaterThan(lowIndex);
+            done();
+          }).catch(function(e) {
+            done(e);
+          }).then(function() {
+            localFirebase.removeByKey(key);
+          });
+
+          key = localFirebase.add(data).key();
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

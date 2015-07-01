@@ -1,11 +1,16 @@
 <!--
-Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../paper-styles/default-theme.html">
+<link rel="import" href="../paper-behaviors/paper-inky-focus-behavior.html">
 
 <!--
 `paper-radio-button` is a button that can be either checked or unchecked.
@@ -18,143 +23,114 @@ are inside a radio group, only one radio button in the group can be checked.
 Example:
 
     <paper-radio-button></paper-radio-button>
-    
-Styling radio button:
 
-To change the ink color for checked state:
+### Styling
 
-    paper-radio-button::shadow #ink[checked] {
-      color: #4285f4;
-    }
-    
-To change the radio checked color:
-    
-    paper-radio-button::shadow #onRadio {
-      background-color: #4285f4;
-    }
-    
-To change the ink color for unchecked state:
+The following custom properties and mixins are available for styling:
 
-    paper-radio-button::shadow #ink {
-      color: #b5b5b5;
-    }
-    
-To change the radio unchecked color:
-    
-    paper-radio-button::shadow #offRadio {
-      border-color: #b5b5b5;
-    }
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-radio-button-unchecked-color` | Radio button color when the input is not checked | `--primary-text-color`
+`--paper-radio-button-unchecked-ink-color` | Selected/focus ripple color when the input is not checked | `--primary-text-color`
+`--paper-radio-button-checked-color` | Radio button color when the input is checked | `--default-primary-color`
+`--paper-radio-button-checked-ink-color` | Selected/focus ripple color when the input is checked | `--default-primary-color`
+`--paper-radio-button-label-color` | Label color | `--primary-text-color`
 
 @group Paper Elements
 @element paper-radio-button
-@homepage github.io
+@hero hero.svg
+@demo demo/index.html
 -->
 
-<link rel="import" href="../paper-ripple/paper-ripple.html">
-<link rel="import" href="../core-a11y-keys/core-a11y-keys.html">
+<dom-module id="paper-radio-button">
 
-<polymer-element name="paper-radio-button" role="radio" tabindex="0" aria-checked="false">
-<template>
+  <link rel="import" type="css" href="paper-radio-button.css">
 
-  <link rel="stylesheet" href="paper-radio-button.css">
+  <template>
 
-  <core-a11y-keys target="{{}}" keys="space" on-keys-pressed="{{tap}}"></core-a11y-keys>
-  
-  <div id="radioContainer" class="{{ {labeled: label} | tokenList }}">
-  
-    <div id="offRadio"></div>
-    <div id="onRadio"></div>
-    
-    <paper-ripple id="ink" class="circle recenteringTouch" checked?="{{!checked}}"></paper-ripple>
-    
-  </div>
-  
-  <div id="radioLabel" aria-hidden="true" hidden?="{{!label}}">{{label}}<content></content></div>
-  
-</template>
-<script>
+    <div id="radioContainer">
+      <div id="offRadio"></div>
+      <div id="onRadio"></div>
+      <paper-ripple id="ink" class="circle" center checked$="[[checked]]"></paper-ripple>
+    </div>
 
-  Polymer('paper-radio-button', {
-    
-    /**
-     * Fired when the checked state changes due to user interaction.
-     *
-     * @event change
-     */
-     
-    /**
-     * Fired when the checked state changes.
-     *
-     * @event core-change
-     */
-    
-    publish: {
-      /**
-       * Gets or sets the state, `true` is checked and `false` is unchecked.
-       *
-       * @attribute checked
-       * @type boolean
-       * @default false
-       */
-      checked: {value: false, reflect: true},
-      
-      /**
-       * The label for the radio button.
-       *
-       * @attribute label
-       * @type string
-       * @default ''
-       */
-      label: '',
-      
-      /**
-       * Normally the user cannot uncheck the radio button by tapping once
-       * checked.  Setting this property to `true` makes the radio button
-       * toggleable from checked to unchecked.
-       *
-       * @attribute toggles
-       * @type boolean
-       * @default false
-       */
-      toggles: false,
-      
-      /**
-       * If true, the user cannot interact with this element.
-       *
-       * @attribute disabled
-       * @type boolean
-       * @default false
-       */
-      disabled: {value: false, reflect: true}
-    },
-    
-    eventDelegates: {
-      tap: 'tap'
-    },
-    
-    tap: function() {
-      var old = this.checked;
-      this.toggle();
-      if (this.checked !== old) {
-        this.fire('change');
+    <div id="radioLabel" aria-hidden="true"><content></content></div>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'paper-radio-button',
+
+      behaviors: [
+        Polymer.PaperInkyFocusBehavior
+      ],
+
+      hostAttributes: {
+        role: 'radio',
+        'aria-checked': false,
+        tabindex: 0
+      },
+
+      properties: {
+        /**
+         * Fired when the checked state changes due to user interaction.
+         *
+         * @event change
+         */
+
+        /**
+         * Fired when the checked state changes.
+         *
+         * @event iron-change
+         */
+
+        /**
+         * Gets or sets the state, `true` is checked and `false` is unchecked.
+         */
+        checked: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          notify: true,
+          observer: '_checkedChanged'
+        },
+
+        /**
+         * If true, the button toggles the active state with each tap or press
+         * of the spacebar.
+         */
+        toggles: {
+          type: Boolean,
+          value: true,
+          reflectToAttribute: true
+        }
+      },
+
+      ready: function() {
+        if (Polymer.dom(this).textContent == '') {
+          this.$.radioLabel.hidden = true;
+        } else {
+          this.setAttribute('aria-label', Polymer.dom(this).textContent);
+        }
+        this._isReady = true;
+      },
+
+      _buttonStateChanged: function() {
+        if (this.disabled) {
+          return;
+        }
+        if (this._isReady) {
+          this.checked = this.active;
+        }
+      },
+
+      _checkedChanged: function() {
+        this.setAttribute('aria-checked', this.checked ? 'true' : 'false');
+        this.active = this.checked;
+        this.fire('iron-change');
       }
-    },
-    
-    toggle: function() {
-      this.checked = !this.toggles || !this.checked;
-    },
-    
-    checkedChanged: function() {
-      this.$.onRadio.classList.toggle('fill', this.checked);
-      this.setAttribute('aria-checked', this.checked ? 'true': 'false');
-      this.fire('core-change');
-    },
-    
-    labelChanged: function() {
-      this.setAttribute('aria-label', this.label);
-    }
-    
-  });
-  
-</script>
-</polymer-element>
+    })
+  </script>
+
+</dom-module>

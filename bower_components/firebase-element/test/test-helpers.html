@@ -1,0 +1,14 @@
+<script>
+  function randomKey() {
+    return (0|(Math.random() * 999999999)).toString();
+  }
+
+  function waitForEvent(element, event) {
+    return new Promise(function(resolve, reject) {
+      element.addEventListener(event, function onEvent() {
+        element.removeEventListener(event, onEvent);
+        resolve();
+      });
+    });
+  }
+</script>

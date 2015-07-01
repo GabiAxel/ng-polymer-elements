@@ -1,4 +1,5 @@
-paper-input
-===================
+# paper-input
 
-See the [component page](http://www.polymer-project.org/docs/elements/paper-elements.html#paper-input) for more information.
+`<paper-input>` is a Material Design text field.
+
+Contains a number of different features for validation, character counting, and more.

@@ -1,5 +1,6 @@
-/*
-Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+/**
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
@@ -15,7 +16,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+:host(:not([disabled])) #sliderBar::shadow #activeProgress {
+  background-color: var(--paper-slider-active-color, --google-blue-700);
+}
+
+:host(:not([disabled])) #sliderBar::shadow #secondaryProgress {
+  background-color: var(--paper-slider-secondary-color, --google-blue-300);
+}
+
+:host([disabled]) #sliderBar::shadow #activeProgress {
+  background-color: var(--paper-slider-disabled-active-color, --google-grey-500);
+}
+
+:host([disabled]) #sliderBar::shadow #secondaryProgress {
+  background-color: var(--paper-slider-disabled-secondary-color, --google-grey-300);
 }
 
 :host(:focus) {
@@ -66,6 +83,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   width: 100%;
   padding: 8px 0;
   margin: -8px 0;
+  background-color: var(--paper-slider-bar-color, transparent);
 }
 
 .ring #sliderBar {
@@ -88,7 +106,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   pointer-events: none;
 }
 
-.slider-markers::after, .slider-marker::after {
+.slider-markers::after,
+.slider-marker::after {
   content: "";
   display: block;
   width: 2px;
@@ -97,16 +116,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   background-color: black;
 }
 
-#sliderBar::shadow #activeProgress {
-  background-color: #3f51b5;
-}
-
 .transiting #sliderBar::shadow #activeProgress {
-  transition: -webkit-transform 0.08s ease;
+  -webkit-transition: -webkit-transform 0.08s ease;
   transition: transform 0.08s ease;
 }
 
 #sliderKnob {
+  @apply(--layout-center-justified);
+  @apply(--layout-center);
+  @apply(--layout-horizontal);
+
   position: absolute;
   left: 0;
   top: 0;
@@ -137,12 +156,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   border-radius: 50%;
-  background-color: #3f51b5;
-  /* FIXME(ffu): can't use the following. https://github.com/Polymer/platform/issues/53 */
-  /* transition-property: height, width, background-color, border;
+  background-color: var(--paper-slider-knob-color, --google-blue-700);
+  transition-property: height, width, background-color, border;
   transition-duration: 0.1s;
-  transition-timing-function: ease; */
-  transition: height 0.18s ease, width 0.18s ease;
+  transition-timing-function: ease;
 }
 
 .expand:not(.pin) > #sliderKnob > #sliderKnobInner {
@@ -158,7 +175,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 }
 
 #sliderKnobInner::before {
-  background-color: #3f51b5;
+  background-color: var(--paper-slider-pin-color, --google-blue-700);
 }
 
 .pin > #sliderKnob > #sliderKnobInner::before {
@@ -174,7 +191,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   transform: rotate(-45deg) scale(0) translate(0);
 }
 
-#sliderKnobInner::before, #sliderKnobInner::after {
+#sliderKnobInner::before,
+#sliderKnobInner::after {
   transition: -webkit-transform .2s ease, background-color .18s ease;
   transition: transform .2s ease, background-color .18s ease;
 }
@@ -196,7 +214,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   width: 32px;
   height: 26px;
   text-align: center;
-  color: #fff;
+  color: var(--paper-slider-font-color, #fff);
   font-size: 10px;
   -webkit-transform: scale(0) translate(0);
   transform: scale(0) translate(0);
@@ -227,13 +245,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 .disabled > #sliderKnob > #sliderKnobInner {
   width: 8px;
   height: 8px;
-  background-color: #c8c8c8;
+  background-color: var(--paper-slider-disabled-knob-color, --google-grey-500);
 }
 
 .disabled.ring > #sliderKnob > #sliderKnobInner {
   background-color: transparent;
 }
 
-#sliderContainer.disabled #sliderBar::shadow #activeProgress {
-  background-color: #c8c8c8;
+paper-ripple {
+  color: var(--paper-slider-knob-color, --google-blue-700);
 }

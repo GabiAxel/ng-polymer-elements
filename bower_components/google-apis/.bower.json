@@ -1,0 +1,39 @@
+{
+  "name": "google-apis",
+  "version": "1.0.2",
+  "description": "Web components to load Google API libraries",
+  "homepage": "https://googlewebcomponents.github.io/google-apis",
+  "main": "google-apis.html",
+  "authors": [
+    "Scott Miles <sjmiles@google.com>",
+    "Eric Bidelman <ebidel@gmail.com>"
+  ],
+  "license": "Apache2",
+  "ignore": [
+    "/.*",
+    "/test/"
+  ],
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "google",
+    "apis"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "iron-jsonp-library": "PolymerElements/iron-jsonp-library#^1.0.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0"
+  },
+  "_release": "1.0.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.0.2",
+    "commit": "7e8a931dd8ad48adc9d82dfe6e6f8a60b7c946c4"
+  },
+  "_source": "git://github.com/GoogleWebComponents/google-apis.git",
+  "_target": "^1.0.0",
+  "_originalSource": "GoogleWebComponents/google-apis"
+}

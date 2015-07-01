@@ -1,5 +1,6 @@
 <!--
-Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
@@ -7,7 +8,13 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../paper-styles/default-theme.html">
+<link rel="import" href="../paper-behaviors/paper-inky-focus-behavior.html">
+
 <!--
+
 `paper-checkbox` is a button that can be either checked or unchecked.  User
 can tap the checkbox to check or uncheck it.  Usually you use checkboxes
 to allow user to select multiple options from a set.  If you have a single
@@ -16,95 +23,129 @@ instead.
 
 Example:
 
-    <paper-checkbox></paper-checkbox>
+    <paper-checkbox>label</paper-checkbox>
 
-    <paper-checkbox checked></paper-checkbox>
-    
-Styling checkbox:
+    <paper-checkbox checked> label</paper-checkbox>
 
-To change the ink color for checked state:
+### Styling
 
-    paper-checkbox::shadow #ink[checked] {
-      color: #4285f4;
-    }
-    
-To change the checkbox checked color:
+The following custom properties and mixins are available for styling:
 
-    paper-checkbox::shadow #checkbox.checked {
-      border-color: #4285f4;
-    }
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-checkbox-unchecked-color` | Checkbox color when the input is not checked | `--primary-text-color`
+`--paper-checkbox-unchecked-ink-color` | Selected/focus ripple color when the input is not checked | `--primary-text-color`
+`--paper-checkbox-checked-color` | Checkbox color when the input is checked | `--default-primary-color`
+`--paper-checkbox-checked-ink-color` | Selected/focus ripple color when the input is checked | `--default-primary-color`
+`--paper-checkbox-label-color` | Label color | `--primary-text-color`
 
-To change the ink color for unchecked state:
-
-    paper-checkbox::shadow #ink {
-      color: #b5b5b5;
-    }
-
-To change the checbox unchecked color:
-
-    paper-checkbox::shadow #checkbox {
-      border-color: #b5b5b5;
-    }
-
-@group Paper Elements
-@element paper-checkbox
-@extends paper-radio-button
-@homepage github.io
+@demo demo/index.html
 -->
 
-<link rel="import" href="../paper-radio-button/paper-radio-button.html">
+<dom-module id="paper-checkbox">
+  <link rel="import" type="css" href="paper-checkbox.css">
 
-<polymer-element name="paper-checkbox" extends="paper-radio-button" role="checkbox">
-<template>
+  <template>
 
-  <link rel="stylesheet" href="paper-checkbox.css">
+    <div id="checkboxContainer">
+      <paper-ripple id="ink" class="circle" center checked$="[[checked]]"></paper-ripple>
+      <div id="checkbox" class$="[[_computeCheckboxClass(checked)]]">
+        <div id="checkmark" class$="[[_computeCheckmarkClass(checked)]]"></div>
+      </div>
+    </div>
 
-  <div id="checkboxContainer" class="{{ {labeled: label} | tokenList }}" >
-  
-    <paper-ripple id="ink" class="circle recenteringTouch" checked?="{{!checked}}"></paper-ripple>
-     
-    <div id="checkbox" on-animationend="{{checkboxAnimationEnd}}" on-webkitAnimationEnd="{{checkboxAnimationEnd}}"></div>
-    
-  </div>
-  
-  <div id="checkboxLabel" hidden?="{{!label}}">{{label}}<content></content></div>
+    <div id="checkboxLabel" aria-hidden="true"><content></content></div>
 
-</template>
-<script>
+  </template>
 
-  Polymer('paper-checkbox', {
-    
-    /**
-     * Fired when the checked state changes due to user interaction.
-     *
-     * @event change
-     */
-     
-    /**
-     * Fired when the checked state changes.
-     *
-     * @event core-change
-     */
-    
-    toggles: true,
+  <script>
+    Polymer({
+      is: 'paper-checkbox',
 
-    checkedChanged: function() {
-      var cl = this.$.checkbox.classList;
-      cl.toggle('checked', this.checked);
-      cl.toggle('unchecked', !this.checked);
-      cl.toggle('checkmark', !this.checked);
-      cl.toggle('box', this.checked);
-      this.setAttribute('aria-checked', this.checked ? 'true': 'false');
-      this.fire('core-change');
-    },
+      behaviors: [
+        Polymer.PaperInkyFocusBehavior
+      ],
 
-    checkboxAnimationEnd: function() {
-      var cl = this.$.checkbox.classList;
-      cl.toggle('checkmark', this.checked && !cl.contains('checkmark'));
-      cl.toggle('box', !this.checked && !cl.contains('box'));
-    }
+      hostAttributes: {
+        role: 'checkbox',
+        'aria-checked': false,
+        tabindex: 0
+      },
 
-  });
-  
-</script>
-</polymer-element>
+      properties: {
+        /**
+         * Fired when the checked state changes due to user interaction.
+         *
+         * @event change
+         */
+
+        /**
+         * Fired when the checked state changes.
+         *
+         * @event iron-change
+         */
+
+        /**
+         * Gets or sets the state, `true` is checked and `false` is unchecked.
+         */
+        checked: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          notify: true,
+          observer: '_checkedChanged'
+        },
+
+        /**
+         * If true, the button toggles the active state with each tap or press
+         * of the spacebar.
+         */
+        toggles: {
+          type: Boolean,
+          value: true,
+          reflectToAttribute: true
+        }
+      },
+
+      ready: function() {
+        if (Polymer.dom(this).textContent == '') {
+          this.$.checkboxLabel.hidden = true;
+        } else {
+          this.setAttribute('aria-label', Polymer.dom(this).textContent);
+        }
+        this._isReady = true;
+      },
+
+      // button-behavior hook
+      _buttonStateChanged: function() {
+        if (this.disabled) {
+          return;
+        }
+        if (this._isReady) {
+          this.checked = this.active;
+        }
+      },
+
+      _checkedChanged: function(checked) {
+        this.setAttribute('aria-checked', this.checked ? 'true' : 'false');
+        this.active = this.checked;
+        this.fire('iron-change');
+      },
+
+      _computeCheckboxClass: function(checked) {
+        if (checked) {
+          return 'checked';
+        }
+        return '';
+      },
+
+      _computeCheckmarkClass: function(checked) {
+        if (!checked) {
+          return 'hidden';
+        }
+        return '';
+      }
+    })
+  </script>
+
+</dom-module>
