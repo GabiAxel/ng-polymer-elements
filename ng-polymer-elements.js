@@ -44,7 +44,7 @@
     var allMappings = {
       ironSelector: multiSelectableMappings,
       paperInput: inputMappings,
-      paperTextArea: inputMappings,
+      paperTextarea: inputMappings,
       paperRadioGroup: selectorMappings,
       paperTabs: selectorMappings,
       paperMenu: multiSelectableMappings,
