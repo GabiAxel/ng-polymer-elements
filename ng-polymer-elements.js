@@ -43,19 +43,20 @@
 
     var allMappings = {
       ironSelector: multiSelectableMappings,
-      paperInput: inputMappings,
-      paperTextarea: inputMappings,
-      paperRadioGroup: selectorMappings,
-      paperTabs: selectorMappings,
-      paperMenu: multiSelectableMappings,
-      paperCheckbox: checkMappings,
-      paperToggleButton: checkMappings,
-      paperDialog: {
+      ndInput: inputMappings,
+      ndTextarea: inputMappings,
+      ndRadioGroup: selectorMappings,
+      ndTabs: selectorMappings,
+      ndMenu: multiSelectableMappings,
+      ndCheckbox: checkMappings,
+      ndRadioButton: checkMappings,
+      ndToggleButton: checkMappings,
+      ndDialog: {
         ngOpened: '=opened',
         ngOverlayOpened: '&iron-overlay-opened',
         ngOverlayClosed: '&iron-overlay-closed'
       },
-      paperSlider: {
+      ndSlider: {
         ngModel: '=value',
         ngChange: '&value-change',
         ngDisabled: '=disabled'
