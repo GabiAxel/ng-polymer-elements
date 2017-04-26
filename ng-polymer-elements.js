@@ -43,20 +43,19 @@
 
     var allMappings = {
       ironSelector: multiSelectableMappings,
-      ndInput: inputMappings,
-      ndTextarea: inputMappings,
-      ndRadioGroup: selectorMappings,
-      ndTabs: selectorMappings,
-      ndMenu: multiSelectableMappings,
-      ndCheckbox: checkMappings,
-      ndRadioButton: checkMappings,
-      ndToggleButton: checkMappings,
-      ndDialog: {
+      paperInput: inputMappings,
+      paperTextarea: inputMappings,
+      paperRadioGroup: selectorMappings,
+      paperTabs: selectorMappings,
+      paperMenu: multiSelectableMappings,
+      paperCheckbox: checkMappings,
+      paperToggleButton: checkMappings,
+      paperDialog: {
         ngOpened: '=opened',
         ngOverlayOpened: '&iron-overlay-opened',
         ngOverlayClosed: '&iron-overlay-closed'
       },
-      ndSlider: {
+      paperSlider: {
         ngModel: '=value',
         ngChange: '&value-change',
         ngDisabled: '=disabled'
@@ -194,7 +193,12 @@
                 // Property mapping
 
                 var propertyName = mapped;
-                var propertyInfo = el.getPropertyInfo(mapped);
+                var propertyInfo;
+                if(el.getPropertyInfo) {
+                  propertyInfo = el.getPropertyInfo(mapped);
+                } else {
+                  propertyInfo = el.constructor.__classProperties[mapped];
+                }
                 var propertyType = propertyInfo.type;
                 var readOnly = propertyInfo.readOnly;
 
