@@ -197,7 +197,14 @@
                 if(el.getPropertyInfo) {
                   propertyInfo = el.getPropertyInfo(mapped);
                 } else {
-                  propertyInfo = el.constructor.__classProperties[mapped];
+                  var behaviorProps = el.behaviors.map(function(x) {
+                      return x.properties;
+                  });
+                  var classProps = Object.assign({}, el.constructor.properties, behaviorProps.reduce(function(o, val) {
+                      return Object.assign(o, val);
+                  }));
+
+                  propertyInfo = classProps[mapped];
                 }
                 var propertyType = propertyInfo.type;
                 var readOnly = propertyInfo.readOnly;
