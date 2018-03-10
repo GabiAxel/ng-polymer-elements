@@ -92,7 +92,22 @@
       }
     };
 
-    // Extension point for overriding mappings
+    // HACK for angular dirty handling
+    var interactionElement = null;
+    document.addEventListener('keydown', function(e) {
+      interactionElement = e.srcElement;
+    }, true);
+    document.addEventListener('touchstart', function(e) {
+      interactionElement = e.srcElement;
+    }, true);
+    document.addEventListener('mousedown', function(e) {
+      interactionElement = e.srcElement;
+    }, true);
+    document.addEventListener('focusout', function(e) {
+      interactionElement = null;
+    }, true);
+
+        // Extension point for overriding mappings
     if($injector.has('$ngPolymerMappings')) {
       var extendedMappings = $injector.get('$ngPolymerMappings');
       angular.extend(allMappings, extendedMappings);
@@ -145,9 +160,10 @@
 
         return {
           restrict: 'E',
+          require: '?ngModel',
           scope: scopeDefinition,
 
-          link: function (scope, element, attrs) {
+          link: function (scope, element, attrs, ctrl) {
 
             var el = element[0];
 
@@ -275,6 +291,9 @@
                   return '-' + $1.toLowerCase();
                 }) + '-changed';
                 el.addEventListener(eventName, function(event) {
+                  if (ctrl && attr === 'ngModel' && el === interactionElement) {
+                    ctrl.$setDirty();
+                  }
                   var value = el[propertyName]; //event.detail.value;
                   el.async(function() {
                     scope.$apply(function () {
